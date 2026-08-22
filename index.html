@@ -7,6 +7,7 @@
 :root {
   --paper:#FAFAF9; --raised:#FFFFFF; --ink:#15171A; --soft:#5C616B;
   --rule:#E2E3E6; --accent:#1E4C8A; --flag:#8A6A1E;
+  --ours:#1e5fbe; --price:#af8214;
   --serif:"Newsreader",Georgia,"Times New Roman",serif;
   --sans:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
@@ -15,11 +16,13 @@
   :root:not([data-theme="light"]) {
     --paper:#111214; --raised:#17191C; --ink:#E7E8EA; --soft:#9298A2;
     --rule:#2A2D32; --accent:#7BA7DD; --flag:#C6A153;
+    --ours:#2d9bf0; --price:#d27d1e;
   }
 }
 :root[data-theme="dark"] {
   --paper:#111214; --raised:#17191C; --ink:#E7E8EA; --soft:#9298A2;
   --rule:#2A2D32; --accent:#7BA7DD; --flag:#C6A153;
+  --ours:#2d9bf0; --price:#d27d1e;
 }
 *,*::before,*::after { box-sizing:border-box; }
 body { margin:0; background:var(--paper); color:var(--ink);
@@ -127,6 +130,34 @@ td.add { width:2rem; text-align:center; color:var(--soft); font-family:var(--mon
   color:var(--ink); }
 #edgeWarn { margin-top:.6rem; font-size:.8rem; color:var(--flag); min-height:1.2em; }
 
+.gapwrap { border:1px solid var(--rule); background:var(--raised);
+  padding:1.2rem .4rem 1rem; overflow-x:auto; }
+.gapchart { width:100%; min-width:34rem; height:auto; display:block; }
+.gapchart .gl { stroke:var(--rule); stroke-width:1; }
+.gapchart .gt { fill:var(--soft); font-family:var(--mono); font-size:9.5px;
+  text-anchor:middle; }
+.gapchart .gap-team { fill:var(--ink); font-family:var(--sans); font-size:11.5px;
+  font-weight:600; text-anchor:end; }
+.gapchart .gap-val { fill:var(--soft); font-family:var(--mono); font-size:10px; }
+.gapchart .gap-link { stroke:var(--soft); stroke-width:2; opacity:.4; }
+.gapchart .dot-ours { fill:var(--ours); stroke:var(--raised); stroke-width:2; }
+.gapchart .dot-price { fill:var(--price); stroke:var(--raised); stroke-width:2; }
+.gapchart .hit { fill:transparent; }
+.gap-row { cursor:default; outline:none; }
+.gap-row:hover .hit, .gap-row:focus-visible .hit {
+  fill:color-mix(in srgb,var(--accent) 7%,transparent); }
+.gap-row:hover .gap-link { opacity:.8; }
+.legend { display:flex; gap:1.3rem; margin:.9rem 0 0; font-size:.8rem;
+  color:var(--soft); flex-wrap:wrap; align-items:center; }
+.legend b { display:inline-flex; align-items:center; gap:.4rem;
+  font-weight:500; color:var(--ink); }
+.swatch { width:11px; height:11px; border-radius:50%; display:inline-block; }
+.sw-ours { background:var(--ours); } .sw-price { background:var(--price); }
+
+.confbar { display:inline-block; width:2.6rem; height:4px; background:var(--rule);
+  vertical-align:middle; margin-left:.45rem; position:relative; }
+.confbar span { position:absolute; inset:0 auto 0 0; background:var(--ours); }
+
 .note { border-left:2px solid var(--flag); padding:.1rem 0 .1rem 1rem;
   margin:1.5rem 0 0; font-size:.9rem; color:var(--soft); max-width:34rem; }
 
@@ -151,6 +182,21 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
 </div></div>
 
 <section><div class="wrap">
+  <h2>What we think, against what you pay</h2>
+  <p class="lede measure">Two dots per game on one probability axis. On 13 of 16 games our number sits below the price, and that distance is the sportsbook&rsquo;s margin. On 3 we come out above it &mdash; those are the only games here the model actually disagrees with the market about.</p>
+  <div class="gapwrap"><svg class="gapchart" viewBox="0 0 720 460" role="list" aria-label="Model probability against price-implied probability"><line class="gl" x1="213.8" y1="14" x2="213.8" y2="434"/><text class="gt" x="213.8" y="8">50%</text><line class="gl" x1="319.6" y1="14" x2="319.6" y2="434"/><text class="gt" x="319.6" y="8">60%</text><line class="gl" x1="425.5" y1="14" x2="425.5" y2="434"/><text class="gt" x="425.5" y="8">70%</text><line class="gl" x1="531.3" y1="14" x2="531.3" y2="434"/><text class="gt" x="531.3" y="8">80%</text><line class="gl" x1="637.1" y1="14" x2="637.1" y2="434"/><text class="gt" x="637.1" y="8">90%</text><g class="gap-row" tabindex="0" role="listitem" aria-label="LAC: we say 81%, price implies 85%"><rect class="hit" x="0" y="15" width="720" height="24"/><text class="gap-team" x="94" y="30">LAC</text><line class="gap-link" x1="544.3" y1="26" x2="586.1" y2="26"/><circle class="dot-price" cx="586.1" cy="26" r="5"/><circle class="dot-ours" cx="544.3" cy="26" r="5"/><text class="gap-val" x="696" y="30">-4</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="JAX: we say 74%, price implies 79%"><rect class="hit" x="0" y="41" width="720" height="24"/><text class="gap-team" x="94" y="56">JAX</text><line class="gap-link" x1="463.5" y1="52" x2="520.1" y2="52"/><circle class="dot-price" cx="520.1" cy="52" r="5"/><circle class="dot-ours" cx="463.5" cy="52" r="5"/><text class="gap-val" x="696" y="56">-5</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="DET: we say 72%, price implies 76%"><rect class="hit" x="0" y="67" width="720" height="24"/><text class="gap-team" x="94" y="82">DET</text><line class="gap-link" x1="448.6" y1="78" x2="484.8" y2="78"/><circle class="dot-price" cx="484.8" cy="78" r="5"/><circle class="dot-ours" cx="448.6" cy="78" r="5"/><text class="gap-val" x="696" y="82">-3</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="PHI: we say 65%, price implies 67%"><rect class="hit" x="0" y="93" width="720" height="24"/><text class="gap-team" x="94" y="108">PHI</text><line class="gap-link" x1="368.5" y1="104" x2="396.0" y2="104"/><circle class="dot-price" cx="396.0" cy="104" r="5"/><circle class="dot-ours" cx="368.5" cy="104" r="5"/><text class="gap-val" x="696" y="108">-3</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="BAL: we say 62%, price implies 65%"><rect class="hit" x="0" y="119" width="720" height="24"/><text class="gap-team" x="94" y="134">BAL</text><line class="gap-link" x1="342.3" y1="130" x2="371.6" y2="130"/><circle class="dot-price" cx="371.6" cy="130" r="5"/><circle class="dot-ours" cx="342.3" cy="130" r="5"/><text class="gap-val" x="696" y="134">-3</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="SEA: we say 61%, price implies 65%"><rect class="hit" x="0" y="145" width="720" height="24"/><text class="gap-team" x="94" y="160">SEA</text><line class="gap-link" x1="334.4" y1="156" x2="371.6" y2="156"/><circle class="dot-price" cx="371.6" cy="156" r="5"/><circle class="dot-ours" cx="334.4" cy="156" r="5"/><text class="gap-val" x="696" y="160">-4</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="LA: we say 61%, price implies 65%"><rect class="hit" x="0" y="171" width="720" height="24"/><text class="gap-team" x="94" y="186">LA</text><line class="gap-link" x1="334.4" y1="182" x2="371.6" y2="182"/><circle class="dot-price" cx="371.6" cy="182" r="5"/><circle class="dot-ours" cx="334.4" cy="182" r="5"/><text class="gap-val" x="696" y="186">-4</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="CIN: we say 61%, price implies 66%"><rect class="hit" x="0" y="197" width="720" height="24"/><text class="gap-team" x="94" y="212">CIN</text><line class="gap-link" x1="334.4" y1="208" x2="387.8" y2="208"/><circle class="dot-price" cx="387.8" cy="208" r="5"/><circle class="dot-ours" cx="334.4" cy="208" r="5"/><text class="gap-val" x="696" y="212">-5</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="LV: we say 61%, price implies 69%"><rect class="hit" x="0" y="223" width="720" height="24"/><text class="gap-team" x="94" y="238">LV</text><line class="gap-link" x1="334.4" y1="234" x2="410.1" y2="234"/><circle class="dot-price" cx="410.1" cy="234" r="5"/><circle class="dot-ours" cx="334.4" cy="234" r="5"/><text class="gap-val" x="696" y="238">-7</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="PIT: we say 60%, price implies 64%"><rect class="hit" x="0" y="249" width="720" height="24"/><text class="gap-team" x="94" y="264">PIT</text><line class="gap-link" x1="317.0" y1="260" x2="358.1" y2="260"/><circle class="dot-price" cx="358.1" cy="260" r="5"/><circle class="dot-ours" cx="317.0" cy="260" r="5"/><text class="gap-val" x="696" y="264">-4</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="TEN: we say 60%, price implies 60%"><rect class="hit" x="0" y="275" width="720" height="24"/><text class="gap-team" x="94" y="290">TEN</text><line class="gap-link" x1="317.0" y1="286" x2="316.2" y2="286"/><circle class="dot-price" cx="316.2" cy="286" r="5"/><circle class="dot-ours" cx="317.0" cy="286" r="5"/><text class="gap-val" x="696" y="290">+0</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="KC: we say 60%, price implies 61%"><rect class="hit" x="0" y="301" width="720" height="24"/><text class="gap-team" x="94" y="316">KC</text><line class="gap-link" x1="317.0" y1="312" x2="327.9" y2="312"/><circle class="dot-price" cx="327.9" cy="312" r="5"/><circle class="dot-ours" cx="317.0" cy="312" r="5"/><text class="gap-val" x="696" y="316">-1</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="CHI: we say 59%, price implies 60%"><rect class="hit" x="0" y="327" width="720" height="24"/><text class="gap-team" x="94" y="342">CHI</text><line class="gap-link" x1="307.4" y1="338" x2="316.2" y2="338"/><circle class="dot-price" cx="316.2" cy="338" r="5"/><circle class="dot-ours" cx="307.4" cy="338" r="5"/><text class="gap-val" x="696" y="342">-1</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="DAL: we say 59%, price implies 60%"><rect class="hit" x="0" y="353" width="720" height="24"/><text class="gap-team" x="94" y="368">DAL</text><line class="gap-link" x1="307.4" y1="364" x2="316.2" y2="364"/><circle class="dot-price" cx="316.2" cy="364" r="5"/><circle class="dot-ours" cx="307.4" cy="364" r="5"/><text class="gap-val" x="696" y="368">-1</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="BUF: we say 55%, price implies 54%"><rect class="hit" x="0" y="379" width="720" height="24"/><text class="gap-team" x="94" y="394">BUF</text><line class="gap-link" x1="271.9" y1="390" x2="257.5" y2="390"/><circle class="dot-price" cx="257.5" cy="390" r="5"/><circle class="dot-ours" cx="271.9" cy="390" r="5"/><text class="gap-val" x="696" y="394">+1</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="MIN: we say 55%, price implies 54%"><rect class="hit" x="0" y="405" width="720" height="24"/><text class="gap-team" x="94" y="420">MIN</text><line class="gap-link" x1="263.8" y1="416" x2="257.5" y2="416"/><circle class="dot-price" cx="257.5" cy="416" r="5"/><circle class="dot-ours" cx="263.8" cy="416" r="5"/><text class="gap-val" x="696" y="420">+1</text></g></svg></div>
+  <div class="legend">
+    <b><i class="swatch sw-ours"></i>Our probability</b>
+    <b><i class="swatch sw-price"></i>What the price implies</b>
+    <span>Right column: the gap, in points.</span>
+  </div>
+  <p class="note" style="border-color:var(--rule)">A positive gap is the model
+  disagreeing with the market, not a guaranteed winner. Over four sealed seasons
+  it found 16 such disagreements worth backing, and they returned
+  &minus;16.6%.</p>
+</div></section>
+
+<section><div class="wrap">
   <h2>The card</h2>
   <p class="lede">Times are UTC. Price is the moneyline on our side.</p>
   <div class="scroller"><table>
@@ -161,7 +207,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
         <td class="when">Thu 10 Sep &middot; 00:20</td>
         <td class="match">NE <span class="at">at</span> SEA</td>
         <td class="pick">SEA</td>
-        <td class="num">61%</td>
+        <td class="num">61%<i class="confbar"><span style="width:25%"></span></i></td>
         <td class="num price">-185</td>
         <td class="num soft">44.5</td>
         <td class="add" aria-hidden="true">+</td>
@@ -171,7 +217,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
         <td class="when">Fri 11 Sep &middot; 00:35</td>
         <td class="match">SF <span class="at">at</span> LA</td>
         <td class="pick">LA</td>
-        <td class="num">61%</td>
+        <td class="num">61%<i class="confbar"><span style="width:25%"></span></i></td>
         <td class="num price">-185</td>
         <td class="num soft">48.5</td>
         <td class="add" aria-hidden="true">+</td>
@@ -181,7 +227,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
         <td class="when">Sun 13 Sep &middot; 17:00</td>
         <td class="match">CHI <span class="at">at</span> CAR</td>
         <td class="pick">CHI</td>
-        <td class="num">59%</td>
+        <td class="num">59%<i class="confbar"><span style="width:20%"></span></i></td>
         <td class="num price">-148</td>
         <td class="num soft">47.5</td>
         <td class="add" aria-hidden="true">+</td>
@@ -191,7 +237,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
         <td class="when">Sun 13 Sep &middot; 17:00</td>
         <td class="match">TB <span class="at">at</span> CIN</td>
         <td class="pick">CIN</td>
-        <td class="num">61%</td>
+        <td class="num">61%<i class="confbar"><span style="width:25%"></span></i></td>
         <td class="num price">-198</td>
         <td class="num soft">51.5</td>
         <td class="add" aria-hidden="true">+</td>
@@ -201,7 +247,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
         <td class="when">Sun 13 Sep &middot; 17:00</td>
         <td class="match">NO <span class="at">at</span> DET</td>
         <td class="pick">DET</td>
-        <td class="num">72%</td>
+        <td class="num">72%<i class="confbar"><span style="width:49%"></span></i></td>
         <td class="num price">-310</td>
         <td class="num soft">48.5</td>
         <td class="add" aria-hidden="true">+</td>
@@ -211,7 +257,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
         <td class="when">Sun 13 Sep &middot; 17:00</td>
         <td class="match">BUF <span class="at">at</span> HOU</td>
         <td class="pick">BUF</td>
-        <td class="num">55%</td>
+        <td class="num">55%<i class="confbar"><span style="width:12%"></span></i></td>
         <td class="num price">-118</td>
         <td class="num soft">44.5</td>
         <td class="add" aria-hidden="true">+</td>
@@ -221,7 +267,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
         <td class="when">Sun 13 Sep &middot; 17:00</td>
         <td class="match">BAL <span class="at">at</span> IND</td>
         <td class="pick">BAL</td>
-        <td class="num">62%</td>
+        <td class="num">62%<i class="confbar"><span style="width:27%"></span></i></td>
         <td class="num price">-185</td>
         <td class="num soft">48.5</td>
         <td class="add" aria-hidden="true">+</td>
@@ -231,7 +277,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
         <td class="when">Sun 13 Sep &middot; 17:00</td>
         <td class="match">CLE <span class="at">at</span> JAX</td>
         <td class="pick">JAX</td>
-        <td class="num">74%</td>
+        <td class="num">74%<i class="confbar"><span style="width:52%"></span></i></td>
         <td class="num price">-375</td>
         <td class="num soft">40.5</td>
         <td class="add" aria-hidden="true">+</td>
@@ -241,7 +287,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
         <td class="when">Sun 13 Sep &middot; 17:00</td>
         <td class="match">ATL <span class="at">at</span> PIT</td>
         <td class="pick">PIT</td>
-        <td class="num">60%</td>
+        <td class="num">60%<i class="confbar"><span style="width:22%"></span></i></td>
         <td class="num price">-175</td>
         <td class="num soft">42.5</td>
         <td class="add" aria-hidden="true">+</td>
@@ -251,7 +297,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
         <td class="when">Sun 13 Sep &middot; 17:00</td>
         <td class="match">NYJ <span class="at">at</span> TEN</td>
         <td class="pick">TEN</td>
-        <td class="num">60%</td>
+        <td class="num">60%<i class="confbar"><span style="width:22%"></span></i></td>
         <td class="num price">-148</td>
         <td class="num soft">38.5</td>
         <td class="add" aria-hidden="true">+</td>
@@ -261,7 +307,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
         <td class="when">Sun 13 Sep &middot; 20:25</td>
         <td class="match">ARI <span class="at">at</span> LAC</td>
         <td class="pick">LAC</td>
-        <td class="num">81%</td>
+        <td class="num">81%<i class="confbar"><span style="width:69%"></span></i></td>
         <td class="num price">-575</td>
         <td class="num soft">46.5</td>
         <td class="add" aria-hidden="true">+</td>
@@ -271,7 +317,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
         <td class="when">Sun 13 Sep &middot; 20:25</td>
         <td class="match">MIA <span class="at">at</span> LV</td>
         <td class="pick">LV</td>
-        <td class="num">61%</td>
+        <td class="num">61%<i class="confbar"><span style="width:25%"></span></i></td>
         <td class="num price">-218</td>
         <td class="num soft">40.5</td>
         <td class="add" aria-hidden="true">+</td>
@@ -281,7 +327,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
         <td class="when">Sun 13 Sep &middot; 20:25</td>
         <td class="match">GB <span class="at">at</span> MIN</td>
         <td class="pick">MIN</td>
-        <td class="num">55%</td>
+        <td class="num">55%<i class="confbar"><span style="width:10%"></span></i></td>
         <td class="num price">-118</td>
         <td class="num soft">45.5</td>
         <td class="add" aria-hidden="true">+</td>
@@ -291,7 +337,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
         <td class="when">Sun 13 Sep &middot; 20:25</td>
         <td class="match">WAS <span class="at">at</span> PHI</td>
         <td class="pick">PHI</td>
-        <td class="num">65%</td>
+        <td class="num">65%<i class="confbar"><span style="width:32%"></span></i></td>
         <td class="num price">-205</td>
         <td class="num soft">47.5</td>
         <td class="add" aria-hidden="true">+</td>
@@ -301,7 +347,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
         <td class="when">Mon 14 Sep &middot; 00:20</td>
         <td class="match">DAL <span class="at">at</span> NYG</td>
         <td class="pick">DAL</td>
-        <td class="num">59%</td>
+        <td class="num">59%<i class="confbar"><span style="width:20%"></span></i></td>
         <td class="num price">-148</td>
         <td class="num soft">48.5</td>
         <td class="add" aria-hidden="true">+</td>
@@ -311,7 +357,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
         <td class="when">Tue 15 Sep &middot; 00:15</td>
         <td class="match">DEN <span class="at">at</span> KC</td>
         <td class="pick">KC</td>
-        <td class="num">60%</td>
+        <td class="num">60%<i class="confbar"><span style="width:22%"></span></i></td>
         <td class="num price">-155</td>
         <td class="num soft">42.5</td>
         <td class="add" aria-hidden="true">+</td>
@@ -420,7 +466,7 @@ footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
 
 <footer><div class="wrap">
   <span>&#945; Quant Alpha Lab</span>
-  <span>Updated 22 Aug 2026 20:50 UTC &middot; 21+ &middot; not betting advice</span>
+  <span>Updated 22 Aug 2026 21:05 UTC &middot; 21+ &middot; not betting advice</span>
 </div></footer>
 
 <script>
