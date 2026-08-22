@@ -1,8 +1,8 @@
 <title>Quant Alpha Lab</title>
-<meta name="description" content="Quantitative NFL research. Every result published, including the ones that failed.">
+<meta name="description" content="NFL picks and parlays, published before kickoff with the confidence attached.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,400;0,500;1,6..72,300&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,400;0,500;1,6..72,300&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 :root {
   --paper:#FAFAF9; --raised:#FFFFFF; --ink:#15171A; --soft:#5C616B;
@@ -22,245 +22,475 @@
   --rule:#2A2D32; --accent:#7BA7DD; --flag:#C6A153;
 }
 *,*::before,*::after { box-sizing:border-box; }
-body {
-  margin:0; background:var(--paper); color:var(--ink);
-  font-family:var(--sans); font-size:17px; line-height:1.65;
-  -webkit-font-smoothing:antialiased;
-}
-.wrap { max-width:64rem; margin:0 auto; padding:0 1.5rem; }
-.measure { max-width:34rem; }
+body { margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:16px; line-height:1.6;
+  -webkit-font-smoothing:antialiased; }
+.wrap { max-width:60rem; margin:0 auto; padding:0 1.5rem; }
+.measure { max-width:32rem; }
 h1,h2,h3 { font-family:var(--serif); font-weight:400; text-wrap:balance; margin:0; }
 a { color:var(--accent); }
 :focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.soft { color:var(--soft); }
 
 .masthead { border-bottom:1px solid var(--rule); }
-.masthead .wrap { display:flex; align-items:baseline; gap:.85rem;
-  padding-top:1.4rem; padding-bottom:1.4rem; }
-.alpha { font-family:var(--serif); font-size:1.9rem; line-height:1; font-style:italic; }
-.wordmark { font-family:var(--sans); font-weight:600; letter-spacing:.13em;
-  text-transform:uppercase; font-size:.72rem; }
-.masthead .meta { margin-left:auto; font-family:var(--mono); font-size:.7rem;
-  color:var(--soft); }
+.masthead .wrap { display:flex; align-items:baseline; gap:.8rem; padding:1.2rem 1.5rem; }
+.alpha { font-family:var(--serif); font-size:1.75rem; line-height:1; font-style:italic; }
+.wordmark { font-weight:600; letter-spacing:.13em; text-transform:uppercase; font-size:.7rem; }
+.masthead .meta { margin-left:auto; font-family:var(--mono); font-size:.7rem; color:var(--soft); }
 
-.hero .wrap { padding:5rem 1.5rem 3.5rem; }
-.hero h1 { font-size:clamp(2.4rem,6vw,4rem); line-height:1.06; letter-spacing:-.02em; }
-.hero h1 em { font-style:italic; color:var(--soft); }
-.hero p { margin:1.6rem 0 0; font-size:1.08rem; color:var(--soft); }
+.hero .wrap { padding:3.5rem 1.5rem 2rem; }
+.eyebrow { font-size:.68rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--accent); font-weight:700; margin:0 0 .6rem; }
+.hero h1 { font-size:clamp(2.1rem,5.5vw,3.4rem); line-height:1.05; letter-spacing:-.02em; }
+.hero p { margin:1.1rem 0 0; color:var(--soft); }
 
-.thesis { display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));
-  gap:1px; background:var(--rule); border:1px solid var(--rule); margin:3.5rem 0 0; }
-.thesis > div { background:var(--raised); padding:1.75rem 1.5rem; }
-.thesis .label { font-size:.68rem; letter-spacing:.14em; text-transform:uppercase;
-  color:var(--soft); font-weight:600; }
-.thesis .big { font-family:var(--mono); font-size:2.3rem; font-weight:500;
-  letter-spacing:-.03em; margin:.5rem 0 .35rem; font-variant-numeric:tabular-nums; }
-.thesis .note { font-size:.86rem; color:var(--soft); line-height:1.5; }
-.thesis .verdict-big { font-family:var(--sans); font-size:1.5rem; font-weight:600;
-  letter-spacing:.01em; color:var(--flag); }
-
-section { padding:4.5rem 0 0; }
-section > .wrap > h2 { font-size:1.85rem; letter-spacing:-.01em; }
-.kicker { font-size:.68rem; letter-spacing:.14em; text-transform:uppercase;
-  color:var(--accent); font-weight:600; margin:0 0 .7rem; }
-.lede { margin:.9rem 0 2rem; color:var(--soft); }
-
-.finding { border-top:1px solid var(--rule); padding:1.5rem 0; }
-.finding header { display:flex; align-items:baseline; gap:1rem; flex-wrap:wrap; }
-.finding h3 { font-size:1.3rem; }
-.verdict { font-family:var(--mono); font-size:.68rem; letter-spacing:.1em;
-  color:var(--flag); border:1px solid currentColor; padding:.16rem .5rem;
-  white-space:nowrap; }
-.finding .what { margin:.6rem 0 .5rem; max-width:38rem; }
-.finding .detail { margin:0; font-family:var(--mono); font-size:.83rem;
-  line-height:1.7; color:var(--soft); max-width:44rem; }
+section { padding:3rem 0 0; }
+section h2 { font-size:1.55rem; letter-spacing:-.01em; }
+.lede { margin:.7rem 0 1.5rem; color:var(--soft); font-size:.95rem; }
 
 .scroller { overflow-x:auto; border:1px solid var(--rule); background:var(--raised); }
-table { width:100%; border-collapse:collapse; font-size:.9rem; }
-th,td { text-align:left; padding:.62rem .9rem; border-bottom:1px solid var(--rule); }
-th { font-size:.66rem; letter-spacing:.12em; text-transform:uppercase;
-  color:var(--soft); font-weight:600; }
+table { width:100%; border-collapse:collapse; font-size:.92rem; }
+th,td { text-align:left; padding:.7rem .9rem; border-bottom:1px solid var(--rule);
+  white-space:nowrap; }
+th { font-size:.64rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--soft); font-weight:700; }
 tbody tr:last-child td { border-bottom:0; }
 .num { font-family:var(--mono); font-variant-numeric:tabular-nums; text-align:right; }
-.pick { font-weight:600; }
+.when { font-family:var(--mono); font-size:.78rem; color:var(--soft); }
+.match { font-weight:500; } .at { color:var(--soft); font-weight:400; }
+.pick { font-weight:700; } .price { color:var(--soft); }
 .pos { color:var(--accent); } .neg { color:var(--flag); }
 
-.method { display:grid; grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));
-  gap:2rem 2.5rem; margin-top:1rem; }
-.method h3 { font-size:1.05rem; margin-bottom:.4rem; }
-.method p { margin:0; font-size:.92rem; color:var(--soft); }
+.parlays { display:grid; grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));
+  gap:1rem; }
+.parlay { border:1px solid var(--rule); background:var(--raised); padding:1.1rem; }
+.parlay header { display:flex; justify-content:space-between; align-items:baseline;
+  border-bottom:1px solid var(--rule); padding-bottom:.6rem; }
+.legs-n { font-size:.66rem; letter-spacing:.13em; text-transform:uppercase;
+  font-weight:700; color:var(--soft); }
+.payout { font-family:var(--mono); font-size:1.15rem; font-weight:500; }
+.legs { list-style:none; margin:.75rem 0; padding:0; display:flex;
+  flex-direction:column; gap:.3rem; }
+.legs li { display:flex; justify-content:space-between; font-size:.88rem; }
+.leg-pick { font-weight:600; }
+.leg-conf { font-family:var(--mono); font-size:.8rem; color:var(--soft); }
+.parlay-stats { display:flex; gap:1.1rem; margin:0; padding-top:.7rem;
+  border-top:1px solid var(--rule); }
+.parlay-stats div { display:flex; flex-direction:column; }
+.parlay-stats dt { font-size:.6rem; letter-spacing:.11em; text-transform:uppercase;
+  color:var(--soft); font-weight:700; }
+.parlay-stats dd { margin:.15rem 0 0; font-family:var(--mono); font-size:.92rem; }
 
-footer { margin-top:5rem; border-top:1px solid var(--rule); }
-footer .wrap { padding:2rem 1.5rem 3rem; display:flex; justify-content:space-between;
-  gap:1rem; flex-wrap:wrap; font-family:var(--mono); font-size:.72rem; color:var(--soft); }
+.record { display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));
+  gap:1px; background:var(--rule); border:1px solid var(--rule); margin-bottom:1.5rem; }
+.record > div { background:var(--raised); padding:1.2rem 1.1rem; }
+.record .label { font-size:.62rem; letter-spacing:.13em; text-transform:uppercase;
+  color:var(--soft); font-weight:700; }
+.record .big { font-family:var(--mono); font-size:1.75rem; font-weight:500;
+  letter-spacing:-.02em; margin-top:.3rem; font-variant-numeric:tabular-nums; }
+
+tr.game { cursor:pointer; transition:background .12s; }
+tr.game:hover { background:color-mix(in srgb,var(--accent) 6%,transparent); }
+tr.game[aria-pressed="true"] { background:color-mix(in srgb,var(--accent) 11%,transparent); }
+tr.game[aria-pressed="true"] .add { transform:rotate(45deg); color:var(--accent); }
+td.add { width:2rem; text-align:center; color:var(--soft); font-family:var(--mono);
+  font-size:1.05rem; transition:transform .15s,color .15s; }
+
+.slip { position:sticky; bottom:0; z-index:5; margin-top:1rem;
+  border:1px solid var(--rule); background:var(--raised);
+  box-shadow:0 -6px 20px rgba(0,0,0,.07); }
+.slip[hidden] { display:none; }
+.slip-head { display:flex; align-items:center; gap:.75rem; padding:.8rem 1rem;
+  border-bottom:1px solid var(--rule); }
+.slip-head h3 { font-size:1rem; margin-right:auto; }
+.slip-clear { background:none; border:1px solid var(--rule); color:var(--soft);
+  font:inherit; font-size:.72rem; padding:.25rem .6rem; cursor:pointer; }
+.slip-clear:hover { color:var(--ink); border-color:var(--soft); }
+.slip-body { display:grid; grid-template-columns:1fr auto; gap:1rem;
+  padding:.9rem 1rem 1rem; align-items:start; }
+#slipLegs { list-style:none; margin:0; padding:0; display:flex;
+  flex-direction:column; gap:.28rem; font-size:.88rem; }
+#slipLegs li { display:flex; gap:.6rem; }
+#slipLegs .x { margin-left:auto; color:var(--soft); cursor:pointer;
+  font-family:var(--mono); background:none; border:0; font-size:.85rem; padding:0; }
+#slipLegs .x:hover { color:var(--flag); }
+.slip-out { display:flex; gap:1.3rem; }
+.slip-out div { display:flex; flex-direction:column; min-width:4.5rem; }
+.slip-out dt, .slip-out .k { font-size:.58rem; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--soft); font-weight:700; }
+.slip-out .v { font-family:var(--mono); font-size:1.2rem; font-weight:500;
+  margin-top:.2rem; font-variant-numeric:tabular-nums; }
+.stake-row { display:flex; align-items:center; gap:.5rem; margin-top:.7rem;
+  font-size:.8rem; color:var(--soft); }
+.stake-row input { width:5rem; font:inherit; font-family:var(--mono);
+  padding:.25rem .45rem; border:1px solid var(--rule); background:var(--paper);
+  color:var(--ink); }
+#edgeWarn { margin-top:.6rem; font-size:.8rem; color:var(--flag); min-height:1.2em; }
+
+.note { border-left:2px solid var(--flag); padding:.1rem 0 .1rem 1rem;
+  margin:1.5rem 0 0; font-size:.9rem; color:var(--soft); max-width:34rem; }
+
+footer { margin-top:4rem; border-top:1px solid var(--rule); }
+footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
+  justify-content:space-between; gap:1rem; flex-wrap:wrap;
+  font-family:var(--mono); font-size:.7rem; color:var(--soft); }
 @media (prefers-reduced-motion:reduce) { *{animation:none!important;transition:none!important} }
 </style>
 
 <header class="masthead"><div class="wrap">
   <span class="alpha">&#945;</span>
   <span class="wordmark">Quant Alpha Lab</span>
-  <span class="meta">2006–2026 &middot; 5,703 games</span>
+  <span class="meta">16 games on the board</span>
 </div></header>
 
 <div class="hero"><div class="wrap">
-  <h1>We can forecast NFL games.<br><em>We cannot beat the price.</em></h1>
-  <p class="measure">Both of those are measured, not asserted. This page publishes
-  every result the lab has produced, including the four that found nothing —
-  because a record that only shows what worked isn't a record.</p>
-
-  <div class="thesis">
-    <div>
-      <div class="label">Winners called correctly</div>
-      <div class="big">67.6%</div>
-      <div class="note">769 of 1,138 games in a sealed
-      holdout the model had never seen. Baseline for always picking the home
-      team: 55.8%.</div>
-    </div>
-    <div>
-      <div class="label">Verdict as a betting system</div>
-      <div class="big verdict-big">NO EDGE</div>
-      <div class="note">The same holdout found 16 bets worth placing. They
-      returned &minus;16.6%. A good forecast and a profitable one are different
-      things.</div>
-    </div>
-    <div>
-      <div class="label">Forecast error</div>
-      <div class="big">9.53</div>
-      <div class="note">Mean absolute error in points on the final margin.
-      Brier score 0.20936; the market's own price scores 0.20971.</div>
-    </div>
-  </div>
+  <p class="eyebrow">Week 1 &middot; posted before kickoff</p>
+  <h1>Every pick, with the number behind it.</h1>
+  <p class="measure">Strongest call on the board is <strong>LAC</strong> at 81%. Confidence is what it says: over a long run of
+  70% calls, roughly seven in ten land. Nothing here is rounded up.</p>
 </div></div>
 
 <section><div class="wrap">
-  <p class="kicker">Findings</p>
-  <h2>Five things we tested. None of them beat the market.</h2>
-  <p class="lede measure">Each was pre-registered before it was run, evaluated
-  walk-forward, and judged against a default-deny checklist that returns
-  <em>no edge</em> unless every gate passes.</p>
-  <article class="finding">
-      <header>
-        <h3>Spreads</h3>
-        <span class="verdict">NO EDGE</span>
-      </header>
-      <p class="what">A one-parameter blend of Elo into the closing line.</p>
-      <p class="detail">β = +0.0973, 95% CI [−0.0320, +0.2266]. Implied edge 0.250 pts against a 0.85 pt profitability floor. The interval includes zero.</p>
-    </article>
-<article class="finding">
-      <header>
-        <h3>Moneyline</h3>
-        <span class="verdict">NO EDGE</span>
-      </header>
-      <p class="what">Win probability from a scoring-grid lattice distribution, against the de-vigged market price.</p>
-      <p class="detail">Brier 0.21192 model vs 0.21109 market. The market wins — and our lattice was also worse than the plain normal curve it set out to improve on.</p>
-    </article>
-<article class="finding">
-      <header>
-        <h3>Totals</h3>
-        <span class="verdict">NO EDGE</span>
-      </header>
-      <p class="what">Over/under probability from the same distribution.</p>
-      <p class="detail">Brier 0.24961 vs 0.25004. The point estimate beats the market and the interval still straddles zero. Only 46 bets cleared the threshold, and they lost.</p>
-    </article>
-<article class="finding">
-      <header>
-        <h3>Thirty-four features</h3>
-        <span class="verdict">NO EDGE</span>
-      </header>
-      <p class="what">Pace, situational efficiency, turnovers, special teams, coaching tendency, strength of schedule, key numbers — ridge-regressed onto the market residual.</p>
-      <p class="detail">MAE 10.362 vs the market&#x27;s 10.317. The features made the forecast slightly worse. On 3,491 games they disagreed with the market about a winner seven times.</p>
-    </article>
-<article class="finding">
-      <header>
-        <h3>Parlays</h3>
-        <span class="verdict">NO EDGE</span>
-      </header>
-      <p class="what">Whether stacking the most confident picks each week beats betting them singly.</p>
-      <p class="detail">In-sample it did, by 18.6 points at five legs. Every interval spans zero, three lucky weeks carry the whole result, and simulation says this happens 19% of the time even when parlays are 4.7× worse.</p>
-    </article>
+  <h2>The card</h2>
+  <p class="lede">Times are UTC. Price is the moneyline on our side.</p>
+  <div class="scroller"><table>
+    <thead><tr><th>Kickoff</th><th>Game</th><th>Pick</th>
+      <th class="num">Conf</th><th class="num">Price</th><th class="num">Total</th><th></th></tr></thead>
+    <tbody><tr class="game" data-i="0" tabindex="0" role="button"
+          aria-pressed="false" aria-label="Add SEA to slip">
+        <td class="when">Thu 10 Sep &middot; 00:20</td>
+        <td class="match">NE <span class="at">at</span> SEA</td>
+        <td class="pick">SEA</td>
+        <td class="num">61%</td>
+        <td class="num price">-185</td>
+        <td class="num soft">44.5</td>
+        <td class="add" aria-hidden="true">+</td>
+      </tr>
+<tr class="game" data-i="1" tabindex="0" role="button"
+          aria-pressed="false" aria-label="Add LA to slip">
+        <td class="when">Fri 11 Sep &middot; 00:35</td>
+        <td class="match">SF <span class="at">at</span> LA</td>
+        <td class="pick">LA</td>
+        <td class="num">61%</td>
+        <td class="num price">-185</td>
+        <td class="num soft">48.5</td>
+        <td class="add" aria-hidden="true">+</td>
+      </tr>
+<tr class="game" data-i="2" tabindex="0" role="button"
+          aria-pressed="false" aria-label="Add CHI to slip">
+        <td class="when">Sun 13 Sep &middot; 17:00</td>
+        <td class="match">CHI <span class="at">at</span> CAR</td>
+        <td class="pick">CHI</td>
+        <td class="num">59%</td>
+        <td class="num price">-148</td>
+        <td class="num soft">47.5</td>
+        <td class="add" aria-hidden="true">+</td>
+      </tr>
+<tr class="game" data-i="3" tabindex="0" role="button"
+          aria-pressed="false" aria-label="Add CIN to slip">
+        <td class="when">Sun 13 Sep &middot; 17:00</td>
+        <td class="match">TB <span class="at">at</span> CIN</td>
+        <td class="pick">CIN</td>
+        <td class="num">61%</td>
+        <td class="num price">-198</td>
+        <td class="num soft">51.5</td>
+        <td class="add" aria-hidden="true">+</td>
+      </tr>
+<tr class="game" data-i="4" tabindex="0" role="button"
+          aria-pressed="false" aria-label="Add DET to slip">
+        <td class="when">Sun 13 Sep &middot; 17:00</td>
+        <td class="match">NO <span class="at">at</span> DET</td>
+        <td class="pick">DET</td>
+        <td class="num">72%</td>
+        <td class="num price">-310</td>
+        <td class="num soft">48.5</td>
+        <td class="add" aria-hidden="true">+</td>
+      </tr>
+<tr class="game" data-i="5" tabindex="0" role="button"
+          aria-pressed="false" aria-label="Add BUF to slip">
+        <td class="when">Sun 13 Sep &middot; 17:00</td>
+        <td class="match">BUF <span class="at">at</span> HOU</td>
+        <td class="pick">BUF</td>
+        <td class="num">55%</td>
+        <td class="num price">-118</td>
+        <td class="num soft">44.5</td>
+        <td class="add" aria-hidden="true">+</td>
+      </tr>
+<tr class="game" data-i="6" tabindex="0" role="button"
+          aria-pressed="false" aria-label="Add BAL to slip">
+        <td class="when">Sun 13 Sep &middot; 17:00</td>
+        <td class="match">BAL <span class="at">at</span> IND</td>
+        <td class="pick">BAL</td>
+        <td class="num">62%</td>
+        <td class="num price">-185</td>
+        <td class="num soft">48.5</td>
+        <td class="add" aria-hidden="true">+</td>
+      </tr>
+<tr class="game" data-i="7" tabindex="0" role="button"
+          aria-pressed="false" aria-label="Add JAX to slip">
+        <td class="when">Sun 13 Sep &middot; 17:00</td>
+        <td class="match">CLE <span class="at">at</span> JAX</td>
+        <td class="pick">JAX</td>
+        <td class="num">74%</td>
+        <td class="num price">-375</td>
+        <td class="num soft">40.5</td>
+        <td class="add" aria-hidden="true">+</td>
+      </tr>
+<tr class="game" data-i="8" tabindex="0" role="button"
+          aria-pressed="false" aria-label="Add PIT to slip">
+        <td class="when">Sun 13 Sep &middot; 17:00</td>
+        <td class="match">ATL <span class="at">at</span> PIT</td>
+        <td class="pick">PIT</td>
+        <td class="num">60%</td>
+        <td class="num price">-175</td>
+        <td class="num soft">42.5</td>
+        <td class="add" aria-hidden="true">+</td>
+      </tr>
+<tr class="game" data-i="9" tabindex="0" role="button"
+          aria-pressed="false" aria-label="Add TEN to slip">
+        <td class="when">Sun 13 Sep &middot; 17:00</td>
+        <td class="match">NYJ <span class="at">at</span> TEN</td>
+        <td class="pick">TEN</td>
+        <td class="num">60%</td>
+        <td class="num price">-148</td>
+        <td class="num soft">38.5</td>
+        <td class="add" aria-hidden="true">+</td>
+      </tr>
+<tr class="game" data-i="10" tabindex="0" role="button"
+          aria-pressed="false" aria-label="Add LAC to slip">
+        <td class="when">Sun 13 Sep &middot; 20:25</td>
+        <td class="match">ARI <span class="at">at</span> LAC</td>
+        <td class="pick">LAC</td>
+        <td class="num">81%</td>
+        <td class="num price">-575</td>
+        <td class="num soft">46.5</td>
+        <td class="add" aria-hidden="true">+</td>
+      </tr>
+<tr class="game" data-i="11" tabindex="0" role="button"
+          aria-pressed="false" aria-label="Add LV to slip">
+        <td class="when">Sun 13 Sep &middot; 20:25</td>
+        <td class="match">MIA <span class="at">at</span> LV</td>
+        <td class="pick">LV</td>
+        <td class="num">61%</td>
+        <td class="num price">-218</td>
+        <td class="num soft">40.5</td>
+        <td class="add" aria-hidden="true">+</td>
+      </tr>
+<tr class="game" data-i="12" tabindex="0" role="button"
+          aria-pressed="false" aria-label="Add MIN to slip">
+        <td class="when">Sun 13 Sep &middot; 20:25</td>
+        <td class="match">GB <span class="at">at</span> MIN</td>
+        <td class="pick">MIN</td>
+        <td class="num">55%</td>
+        <td class="num price">-118</td>
+        <td class="num soft">45.5</td>
+        <td class="add" aria-hidden="true">+</td>
+      </tr>
+<tr class="game" data-i="13" tabindex="0" role="button"
+          aria-pressed="false" aria-label="Add PHI to slip">
+        <td class="when">Sun 13 Sep &middot; 20:25</td>
+        <td class="match">WAS <span class="at">at</span> PHI</td>
+        <td class="pick">PHI</td>
+        <td class="num">65%</td>
+        <td class="num price">-205</td>
+        <td class="num soft">47.5</td>
+        <td class="add" aria-hidden="true">+</td>
+      </tr>
+<tr class="game" data-i="14" tabindex="0" role="button"
+          aria-pressed="false" aria-label="Add DAL to slip">
+        <td class="when">Mon 14 Sep &middot; 00:20</td>
+        <td class="match">DAL <span class="at">at</span> NYG</td>
+        <td class="pick">DAL</td>
+        <td class="num">59%</td>
+        <td class="num price">-148</td>
+        <td class="num soft">48.5</td>
+        <td class="add" aria-hidden="true">+</td>
+      </tr>
+<tr class="game" data-i="15" tabindex="0" role="button"
+          aria-pressed="false" aria-label="Add KC to slip">
+        <td class="when">Tue 15 Sep &middot; 00:15</td>
+        <td class="match">DEN <span class="at">at</span> KC</td>
+        <td class="pick">KC</td>
+        <td class="num">60%</td>
+        <td class="num price">-155</td>
+        <td class="num soft">42.5</td>
+        <td class="add" aria-hidden="true">+</td>
+      </tr></tbody>
+  </table></div>
+
+  <div class="slip" id="slip" hidden>
+    <div class="slip-head">
+      <h3>Your parlay</h3>
+      <button class="slip-clear" id="slipClear" type="button">Clear</button>
+    </div>
+    <div class="slip-body">
+      <div>
+        <ul id="slipLegs"></ul>
+        <div class="stake-row">
+          <label for="stake">Stake</label>
+          <input id="stake" type="number" min="1" step="1" value="10" inputmode="decimal">
+          <span id="stakeOut"></span>
+        </div>
+        <p id="edgeWarn"></p>
+      </div>
+      <div class="slip-out">
+        <div><span class="k">Hits</span><span class="v" id="slipProb">&mdash;</span></div>
+        <div><span class="k">Odds</span><span class="v" id="slipOdds">&mdash;</span></div>
+        <div><span class="k">Edge</span><span class="v" id="slipEdge">&mdash;</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="lede" style="margin-top:1rem">Tap any game to build your own. The
+  edge figure updates as you add legs &mdash; watch which way it moves.</p>
 </div></section>
 
 <section><div class="wrap">
-  <p class="kicker">Track record</p>
-  <h2>Held out, then opened once.</h2>
-  <p class="lede measure">Seasons 2006–2021 were used
-  to build the model. 2022–2025 were sealed and unreadable until the work was
-  finished. The seal has been opened 1 time; every confidence
-  interval computed since has been widened to pay for it.</p>
+  <h2>Parlays</h2>
+  <p class="lede">Built from the most confident calls on the board. Hit rate is
+  the real combined probability, not the sportsbook's implied one.</p>
+  <div class="parlays"><article class="parlay">
+      <header>
+        <span class="legs-n">2 legs</span>
+        <span class="payout">-205</span>
+      </header>
+      <ul class="legs"><li><span class="leg-pick">LAC</span><span class="leg-conf">81%</span></li><li><span class="leg-pick">JAX</span><span class="leg-conf">74%</span></li></ul>
+      <dl class="parlay-stats">
+        <div><dt>Hits</dt><dd>60%</dd></div>
+        <div><dt>Returns</dt><dd>1.49&times;</dd></div>
+        <div><dt>Edge</dt><dd class="neg">-11.1%</dd></div>
+      </dl>
+    </article>
+<article class="parlay">
+      <header>
+        <span class="legs-n">3 legs</span>
+        <span class="payout">-103</span>
+      </header>
+      <ul class="legs"><li><span class="leg-pick">LAC</span><span class="leg-conf">81%</span></li><li><span class="leg-pick">JAX</span><span class="leg-conf">74%</span></li><li><span class="leg-pick">DET</span><span class="leg-conf">72%</span></li></ul>
+      <dl class="parlay-stats">
+        <div><dt>Hits</dt><dd>43%</dd></div>
+        <div><dt>Returns</dt><dd>1.97&times;</dd></div>
+        <div><dt>Edge</dt><dd class="neg">-15.1%</dd></div>
+      </dl>
+    </article>
+<article class="parlay">
+      <header>
+        <span class="legs-n">4 legs</span>
+        <span class="payout">+193</span>
+      </header>
+      <ul class="legs"><li><span class="leg-pick">LAC</span><span class="leg-conf">81%</span></li><li><span class="leg-pick">JAX</span><span class="leg-conf">74%</span></li><li><span class="leg-pick">DET</span><span class="leg-conf">72%</span></li><li><span class="leg-pick">PHI</span><span class="leg-conf">65%</span></li></ul>
+      <dl class="parlay-stats">
+        <div><dt>Hits</dt><dd>28%</dd></div>
+        <div><dt>Returns</dt><dd>2.93&times;</dd></div>
+        <div><dt>Edge</dt><dd class="neg">-18.4%</dd></div>
+      </dl>
+    </article>
+<article class="parlay">
+      <header>
+        <span class="legs-n">5 legs</span>
+        <span class="payout">+351</span>
+      </header>
+      <ul class="legs"><li><span class="leg-pick">LAC</span><span class="leg-conf">81%</span></li><li><span class="leg-pick">JAX</span><span class="leg-conf">74%</span></li><li><span class="leg-pick">DET</span><span class="leg-conf">72%</span></li><li><span class="leg-pick">PHI</span><span class="leg-conf">65%</span></li><li><span class="leg-pick">BAL</span><span class="leg-conf">62%</span></li></ul>
+      <dl class="parlay-stats">
+        <div><dt>Hits</dt><dd>17%</dd></div>
+        <div><dt>Returns</dt><dd>4.51&times;</dd></div>
+        <div><dt>Edge</dt><dd class="neg">-21.9%</dd></div>
+      </dl>
+    </article></div>
+  <p class="note"><strong>Read the edge line.</strong> Stacking legs multiplies
+  the payout and multiplies the house margin with it. We publish the number
+  either way &mdash; when it is negative, that is what the parlay is worth.</p>
+</div></section>
+
+<section><div class="wrap">
+  <h2>The record</h2>
+  <p class="lede">Four seasons of picks, graded. Every game, not a highlight reel.</p>
+  <div class="record">
+    <div><div class="label">Winners called</div><div class="big">67.6%</div></div>
+    <div><div class="label">Games graded</div><div class="big">1,138</div></div>
+    <div><div class="label">Margin error</div><div class="big">9.5</div></div>
+  </div>
   <div class="scroller"><table>
-    <thead><tr><th>Season</th><th class="num">Games</th><th class="num">Winners correct</th></tr></thead>
+    <thead><tr><th>Season</th><th class="num">Games</th><th class="num">Winners called</th></tr></thead>
     <tbody><tr><td>2022</td><td class="num">283</td><td class="num">66.4%</td></tr>
 <tr><td>2023</td><td class="num">285</td><td class="num">67.4%</td></tr>
 <tr><td>2024</td><td class="num">285</td><td class="num">70.5%</td></tr>
 <tr><td>2025</td><td class="num">285</td><td class="num">66.0%</td></tr></tbody>
   </table></div>
-
-  <h3 style="font-size:1.15rem;margin:2.5rem 0 .8rem;">Does the confidence mean anything?</h3>
-  <p class="lede measure">A hit rate can be carried by a handful of lopsided
-  games. This is the harder test: when the model says 70%, does it happen 70% of
-  the time?</p>
-  <div class="scroller"><table>
-    <thead><tr><th>Stated confidence</th><th class="num">Games</th><th class="num">Said</th><th class="num">Happened</th><th class="num">Gap</th></tr></thead>
-    <tbody><tr><td>50%-58%</td><td class="num">232</td><td class="num">56.0%</td><td class="num">53.9%</td><td class="num neg">-2.1%</td></tr>
-<tr><td>58%-67%</td><td class="num">441</td><td class="num">61.3%</td><td class="num">65.3%</td><td class="num pos">+4.0%</td></tr>
-<tr><td>67%-75%</td><td class="num">292</td><td class="num">71.0%</td><td class="num">70.9%</td><td class="num neg">-0.1%</td></tr>
-<tr><td>75%-83%</td><td class="num">103</td><td class="num">79.4%</td><td class="num">81.6%</td><td class="num pos">+2.1%</td></tr>
-<tr><td>83%-92%</td><td class="num">64</td><td class="num">87.4%</td><td class="num">92.2%</td><td class="num pos">+4.8%</td></tr>
-<tr><td>92%-100%</td><td class="num">6</td><td class="num">92.7%</td><td class="num">100.0%</td><td class="num pos">+7.3%</td></tr></tbody>
-  </table></div>
-</div></section>
-
-<section><div class="wrap">
-  <p class="kicker">This week</p>
-  <h2>Open forecasts.</h2>
-  <p class="lede measure">Published before kickoff, timestamped, appended to a
-  log that is never rewritten. Scored whether they land or not.</p>
-  <div class="scroller"><table>
-      <thead><tr><th>Game</th><th>Pick</th><th>Confidence</th><th>Total</th></tr></thead>
-      <tbody><tr><td>NE @ SEA</td><td class="pick">SEA</td><td class="num">61.4%</td><td class="num">44.5</td></tr>
-<tr><td>SF @ LA</td><td class="pick">LA</td><td class="num">61.4%</td><td class="num">48.5</td></tr>
-<tr><td>CHI @ CAR</td><td class="pick">CHI</td><td class="num">58.8%</td><td class="num">47.5</td></tr>
-<tr><td>TB @ CIN</td><td class="pick">CIN</td><td class="num">61.4%</td><td class="num">51.5</td></tr>
-<tr><td>NO @ DET</td><td class="pick">DET</td><td class="num">72.2%</td><td class="num">48.5</td></tr>
-<tr><td>BUF @ HOU</td><td class="pick">BUF</td><td class="num">55.5%</td><td class="num">44.5</td></tr>
-<tr><td>BAL @ IND</td><td class="pick">BAL</td><td class="num">62.1%</td><td class="num">48.5</td></tr>
-<tr><td>CLE @ JAX</td><td class="pick">JAX</td><td class="num">73.6%</td><td class="num">40.5</td></tr>
-<tr><td>ATL @ PIT</td><td class="pick">PIT</td><td class="num">59.8%</td><td class="num">42.5</td></tr>
-<tr><td>NYJ @ TEN</td><td class="pick">TEN</td><td class="num">59.8%</td><td class="num">38.5</td></tr>
-<tr><td>ARI @ LAC</td><td class="pick">LAC</td><td class="num">81.2%</td><td class="num">46.5</td></tr>
-<tr><td>MIA @ LV</td><td class="pick">LV</td><td class="num">61.4%</td><td class="num">40.5</td></tr>
-<tr><td>GB @ MIN</td><td class="pick">MIN</td><td class="num">54.7%</td><td class="num">45.5</td></tr>
-<tr><td>WAS @ PHI</td><td class="pick">PHI</td><td class="num">64.6%</td><td class="num">47.5</td></tr>
-<tr><td>DAL @ NYG</td><td class="pick">DAL</td><td class="num">58.8%</td><td class="num">48.5</td></tr>
-<tr><td>DEN @ KC</td><td class="pick">KC</td><td class="num">59.8%</td><td class="num">42.5</td></tr></tbody></table></div>
-</div></section>
-
-<section><div class="wrap">
-  <p class="kicker">Method</p>
-  <h2>Why you can believe the number.</h2>
-  <div class="method">
-    <div><h3>Leakage firewall</h3><p>Every feature carries the timestamp it
-    became knowable, and there is exactly one sanctioned way to join features to
-    games. A feature that could have seen the future is refused, not warned
-    about.</p></div>
-    <div><h3>Pre-registration</h3><p>6 experiments, each with a
-    hypothesis and a predicted direction written down before the run. The
-    configuration is hashed; changing it and re-running raises an error.</p></div>
-    <div><h3>Sealed holdout</h3><p>1,139 games kept unreadable
-    behind a hash-chained ledger. Opening it is logged permanently and
-    mechanically widens every interval afterwards.</p></div>
-    <div><h3>Placebo nulls</h3><p>A thousand models that know nothing are run
-    through the identical pipeline. If noise reproduces our result, our result is
-    noise — and twice it was.</p></div>
-    <div><h3>Default deny</h3><p>The verdict returns <em>no edge</em> unless
-    every blocking gate passes. The vocabulary stops at <em>edge candidate</em>;
-    nothing in the system can print the word profitable.</p></div>
-    <div><h3>Walk-forward only</h3><p>Models are fitted on prior seasons and
-    scored on the next. Fitting on everything and scoring in-sample inflated one
-    result from +3.5% to +8.9% before the harness caught it.</p></div>
-  </div>
 </div></section>
 
 <footer><div class="wrap">
-  <span>&#945; Quant Alpha Lab &middot; 4,292 games in development, 1,139 sealed</span>
-  <span>Built 2026-08-22 20:33 UTC &middot; not betting advice</span>
+  <span>&#945; Quant Alpha Lab</span>
+  <span>Updated 22 Aug 2026 20:50 UTC &middot; 21+ &middot; not betting advice</span>
 </div></footer>
+
+<script>
+(function () {
+  var CARD = [{"pick": "SEA", "conf": 0.61395, "dec": 1.540541, "price": -185, "game": "NE at SEA"}, {"pick": "LA", "conf": 0.61395, "dec": 1.540541, "price": -185, "game": "SF at LA"}, {"pick": "CHI", "conf": 0.588446, "dec": 1.675676, "price": -148, "game": "CHI at CAR"}, {"pick": "CIN", "conf": 0.61395, "dec": 1.505051, "price": -198, "game": "TB at CIN"}, {"pick": "DET", "conf": 0.721868, "dec": 1.322581, "price": -310, "game": "NO at DET"}, {"pick": "BUF", "conf": 0.554872, "dec": 1.847458, "price": -118, "game": "BUF at HOU"}, {"pick": "BAL", "conf": 0.621381, "dec": 1.540541, "price": -185, "game": "BAL at IND"}, {"pick": "JAX", "conf": 0.735989, "dec": 1.266667, "price": -375, "game": "CLE at JAX"}, {"pick": "PIT", "conf": 0.597507, "dec": 1.571429, "price": -175, "game": "ATL at PIT"}, {"pick": "TEN", "conf": 0.597507, "dec": 1.675676, "price": -148, "game": "NYJ at TEN"}, {"pick": "LAC", "conf": 0.81232, "dec": 1.173913, "price": -575, "game": "ARI at LAC"}, {"pick": "LV", "conf": 0.61395, "dec": 1.458716, "price": -218, "game": "MIA at LV"}, {"pick": "MIN", "conf": 0.547229, "dec": 1.847458, "price": -118, "game": "GB at MIN"}, {"pick": "PHI", "conf": 0.646189, "dec": 1.487805, "price": -205, "game": "WAS at PHI"}, {"pick": "DAL", "conf": 0.588446, "dec": 1.675676, "price": -148, "game": "DAL at NYG"}, {"pick": "KC", "conf": 0.597507, "dec": 1.645161, "price": -155, "game": "DEN at KC"}];
+  var picked = [];
+  var slip = document.getElementById("slip");
+  var legsEl = document.getElementById("slipLegs");
+  var stakeEl = document.getElementById("stake");
+
+  function american(dec) {
+    return dec >= 2 ? "+" + Math.round((dec - 1) * 100)
+                    : String(Math.round(-100 / (dec - 1)));
+  }
+
+  function render() {
+    slip.hidden = picked.length === 0;
+    legsEl.innerHTML = "";
+    var prob = 1, dec = 1;
+    picked.forEach(function (i) {
+      var c = CARD[i];
+      prob *= c.conf; dec *= c.dec;
+      var li = document.createElement("li");
+      li.innerHTML = '<strong>' + c.pick + '</strong> '
+        + '<span class="leg-conf">' + Math.round(c.conf * 100) + '%</span>';
+      var x = document.createElement("button");
+      x.type = "button"; x.className = "x"; x.textContent = "\u00d7";
+      x.setAttribute("aria-label", "Remove " + c.pick);
+      x.onclick = function () { toggle(i); };
+      li.appendChild(x); legsEl.appendChild(li);
+    });
+
+    var edge = picked.length ? prob * dec - 1 : 0;
+    document.getElementById("slipProb").textContent =
+      picked.length ? Math.round(prob * 100) + "%" : "\u2014";
+    document.getElementById("slipOdds").textContent =
+      picked.length ? american(dec) : "\u2014";
+    var eEl = document.getElementById("slipEdge");
+    eEl.textContent = picked.length ? (edge >= 0 ? "+" : "") + (edge * 100).toFixed(1) + "%" : "\u2014";
+    eEl.className = "v " + (edge >= 0 ? "pos" : "neg");
+
+    var stake = parseFloat(stakeEl.value) || 0;
+    document.getElementById("stakeOut").textContent = picked.length
+      ? "returns " + (stake * dec).toFixed(2) + " if it lands"
+      : "";
+
+    var warn = document.getElementById("edgeWarn");
+    warn.textContent = picked.length > 1
+      ? "Each leg you add multiplies the payout \u2014 and the house margin with it."
+      : "";
+  }
+
+  function toggle(i) {
+    var at = picked.indexOf(i);
+    if (at === -1) { picked.push(i); } else { picked.splice(at, 1); }
+    var row = document.querySelector('tr.game[data-i="' + i + '"]');
+    if (row) { row.setAttribute("aria-pressed", at === -1 ? "true" : "false"); }
+    render();
+  }
+
+  document.querySelectorAll("tr.game").forEach(function (row) {
+    var i = parseInt(row.dataset.i, 10);
+    row.addEventListener("click", function () { toggle(i); });
+    row.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); toggle(i); }
+    });
+  });
+  stakeEl.addEventListener("input", render);
+  document.getElementById("slipClear").addEventListener("click", function () {
+    picked.slice().forEach(toggle);
+  });
+})();
+</script>
