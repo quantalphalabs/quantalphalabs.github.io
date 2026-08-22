@@ -1,0 +1,266 @@
+<title>Quant Alpha Lab</title>
+<meta name="description" content="Quantitative NFL research. Every result published, including the ones that failed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,400;0,500;1,6..72,300&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --paper:#FAFAF9; --raised:#FFFFFF; --ink:#15171A; --soft:#5C616B;
+  --rule:#E2E3E6; --accent:#1E4C8A; --flag:#8A6A1E;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark) {
+  :root:not([data-theme="light"]) {
+    --paper:#111214; --raised:#17191C; --ink:#E7E8EA; --soft:#9298A2;
+    --rule:#2A2D32; --accent:#7BA7DD; --flag:#C6A153;
+  }
+}
+:root[data-theme="dark"] {
+  --paper:#111214; --raised:#17191C; --ink:#E7E8EA; --soft:#9298A2;
+  --rule:#2A2D32; --accent:#7BA7DD; --flag:#C6A153;
+}
+*,*::before,*::after { box-sizing:border-box; }
+body {
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:17px; line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap { max-width:64rem; margin:0 auto; padding:0 1.5rem; }
+.measure { max-width:34rem; }
+h1,h2,h3 { font-family:var(--serif); font-weight:400; text-wrap:balance; margin:0; }
+a { color:var(--accent); }
+:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+
+.masthead { border-bottom:1px solid var(--rule); }
+.masthead .wrap { display:flex; align-items:baseline; gap:.85rem;
+  padding-top:1.4rem; padding-bottom:1.4rem; }
+.alpha { font-family:var(--serif); font-size:1.9rem; line-height:1; font-style:italic; }
+.wordmark { font-family:var(--sans); font-weight:600; letter-spacing:.13em;
+  text-transform:uppercase; font-size:.72rem; }
+.masthead .meta { margin-left:auto; font-family:var(--mono); font-size:.7rem;
+  color:var(--soft); }
+
+.hero .wrap { padding:5rem 1.5rem 3.5rem; }
+.hero h1 { font-size:clamp(2.4rem,6vw,4rem); line-height:1.06; letter-spacing:-.02em; }
+.hero h1 em { font-style:italic; color:var(--soft); }
+.hero p { margin:1.6rem 0 0; font-size:1.08rem; color:var(--soft); }
+
+.thesis { display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));
+  gap:1px; background:var(--rule); border:1px solid var(--rule); margin:3.5rem 0 0; }
+.thesis > div { background:var(--raised); padding:1.75rem 1.5rem; }
+.thesis .label { font-size:.68rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--soft); font-weight:600; }
+.thesis .big { font-family:var(--mono); font-size:2.3rem; font-weight:500;
+  letter-spacing:-.03em; margin:.5rem 0 .35rem; font-variant-numeric:tabular-nums; }
+.thesis .note { font-size:.86rem; color:var(--soft); line-height:1.5; }
+.thesis .verdict-big { font-family:var(--sans); font-size:1.5rem; font-weight:600;
+  letter-spacing:.01em; color:var(--flag); }
+
+section { padding:4.5rem 0 0; }
+section > .wrap > h2 { font-size:1.85rem; letter-spacing:-.01em; }
+.kicker { font-size:.68rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent); font-weight:600; margin:0 0 .7rem; }
+.lede { margin:.9rem 0 2rem; color:var(--soft); }
+
+.finding { border-top:1px solid var(--rule); padding:1.5rem 0; }
+.finding header { display:flex; align-items:baseline; gap:1rem; flex-wrap:wrap; }
+.finding h3 { font-size:1.3rem; }
+.verdict { font-family:var(--mono); font-size:.68rem; letter-spacing:.1em;
+  color:var(--flag); border:1px solid currentColor; padding:.16rem .5rem;
+  white-space:nowrap; }
+.finding .what { margin:.6rem 0 .5rem; max-width:38rem; }
+.finding .detail { margin:0; font-family:var(--mono); font-size:.83rem;
+  line-height:1.7; color:var(--soft); max-width:44rem; }
+
+.scroller { overflow-x:auto; border:1px solid var(--rule); background:var(--raised); }
+table { width:100%; border-collapse:collapse; font-size:.9rem; }
+th,td { text-align:left; padding:.62rem .9rem; border-bottom:1px solid var(--rule); }
+th { font-size:.66rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--soft); font-weight:600; }
+tbody tr:last-child td { border-bottom:0; }
+.num { font-family:var(--mono); font-variant-numeric:tabular-nums; text-align:right; }
+.pick { font-weight:600; }
+.pos { color:var(--accent); } .neg { color:var(--flag); }
+
+.method { display:grid; grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));
+  gap:2rem 2.5rem; margin-top:1rem; }
+.method h3 { font-size:1.05rem; margin-bottom:.4rem; }
+.method p { margin:0; font-size:.92rem; color:var(--soft); }
+
+footer { margin-top:5rem; border-top:1px solid var(--rule); }
+footer .wrap { padding:2rem 1.5rem 3rem; display:flex; justify-content:space-between;
+  gap:1rem; flex-wrap:wrap; font-family:var(--mono); font-size:.72rem; color:var(--soft); }
+@media (prefers-reduced-motion:reduce) { *{animation:none!important;transition:none!important} }
+</style>
+
+<header class="masthead"><div class="wrap">
+  <span class="alpha">&#945;</span>
+  <span class="wordmark">Quant Alpha Lab</span>
+  <span class="meta">2006–2026 &middot; 5,703 games</span>
+</div></header>
+
+<div class="hero"><div class="wrap">
+  <h1>We can forecast NFL games.<br><em>We cannot beat the price.</em></h1>
+  <p class="measure">Both of those are measured, not asserted. This page publishes
+  every result the lab has produced, including the four that found nothing —
+  because a record that only shows what worked isn't a record.</p>
+
+  <div class="thesis">
+    <div>
+      <div class="label">Winners called correctly</div>
+      <div class="big">67.6%</div>
+      <div class="note">769 of 1,138 games in a sealed
+      holdout the model had never seen. Baseline for always picking the home
+      team: 55.8%.</div>
+    </div>
+    <div>
+      <div class="label">Verdict as a betting system</div>
+      <div class="big verdict-big">NO EDGE</div>
+      <div class="note">The same holdout found 16 bets worth placing. They
+      returned &minus;16.6%. A good forecast and a profitable one are different
+      things.</div>
+    </div>
+    <div>
+      <div class="label">Forecast error</div>
+      <div class="big">9.53</div>
+      <div class="note">Mean absolute error in points on the final margin.
+      Brier score 0.20936; the market's own price scores 0.20971.</div>
+    </div>
+  </div>
+</div></div>
+
+<section><div class="wrap">
+  <p class="kicker">Findings</p>
+  <h2>Five things we tested. None of them beat the market.</h2>
+  <p class="lede measure">Each was pre-registered before it was run, evaluated
+  walk-forward, and judged against a default-deny checklist that returns
+  <em>no edge</em> unless every gate passes.</p>
+  <article class="finding">
+      <header>
+        <h3>Spreads</h3>
+        <span class="verdict">NO EDGE</span>
+      </header>
+      <p class="what">A one-parameter blend of Elo into the closing line.</p>
+      <p class="detail">β = +0.0973, 95% CI [−0.0320, +0.2266]. Implied edge 0.250 pts against a 0.85 pt profitability floor. The interval includes zero.</p>
+    </article>
+<article class="finding">
+      <header>
+        <h3>Moneyline</h3>
+        <span class="verdict">NO EDGE</span>
+      </header>
+      <p class="what">Win probability from a scoring-grid lattice distribution, against the de-vigged market price.</p>
+      <p class="detail">Brier 0.21192 model vs 0.21109 market. The market wins — and our lattice was also worse than the plain normal curve it set out to improve on.</p>
+    </article>
+<article class="finding">
+      <header>
+        <h3>Totals</h3>
+        <span class="verdict">NO EDGE</span>
+      </header>
+      <p class="what">Over/under probability from the same distribution.</p>
+      <p class="detail">Brier 0.24961 vs 0.25004. The point estimate beats the market and the interval still straddles zero. Only 46 bets cleared the threshold, and they lost.</p>
+    </article>
+<article class="finding">
+      <header>
+        <h3>Thirty-four features</h3>
+        <span class="verdict">NO EDGE</span>
+      </header>
+      <p class="what">Pace, situational efficiency, turnovers, special teams, coaching tendency, strength of schedule, key numbers — ridge-regressed onto the market residual.</p>
+      <p class="detail">MAE 10.362 vs the market&#x27;s 10.317. The features made the forecast slightly worse. On 3,491 games they disagreed with the market about a winner seven times.</p>
+    </article>
+<article class="finding">
+      <header>
+        <h3>Parlays</h3>
+        <span class="verdict">NO EDGE</span>
+      </header>
+      <p class="what">Whether stacking the most confident picks each week beats betting them singly.</p>
+      <p class="detail">In-sample it did, by 18.6 points at five legs. Every interval spans zero, three lucky weeks carry the whole result, and simulation says this happens 19% of the time even when parlays are 4.7× worse.</p>
+    </article>
+</div></section>
+
+<section><div class="wrap">
+  <p class="kicker">Track record</p>
+  <h2>Held out, then opened once.</h2>
+  <p class="lede measure">Seasons 2006–2021 were used
+  to build the model. 2022–2025 were sealed and unreadable until the work was
+  finished. The seal has been opened 1 time; every confidence
+  interval computed since has been widened to pay for it.</p>
+  <div class="scroller"><table>
+    <thead><tr><th>Season</th><th class="num">Games</th><th class="num">Winners correct</th></tr></thead>
+    <tbody><tr><td>2022</td><td class="num">283</td><td class="num">66.4%</td></tr>
+<tr><td>2023</td><td class="num">285</td><td class="num">67.4%</td></tr>
+<tr><td>2024</td><td class="num">285</td><td class="num">70.5%</td></tr>
+<tr><td>2025</td><td class="num">285</td><td class="num">66.0%</td></tr></tbody>
+  </table></div>
+
+  <h3 style="font-size:1.15rem;margin:2.5rem 0 .8rem;">Does the confidence mean anything?</h3>
+  <p class="lede measure">A hit rate can be carried by a handful of lopsided
+  games. This is the harder test: when the model says 70%, does it happen 70% of
+  the time?</p>
+  <div class="scroller"><table>
+    <thead><tr><th>Stated confidence</th><th class="num">Games</th><th class="num">Said</th><th class="num">Happened</th><th class="num">Gap</th></tr></thead>
+    <tbody><tr><td>50%-58%</td><td class="num">232</td><td class="num">56.0%</td><td class="num">53.9%</td><td class="num neg">-2.1%</td></tr>
+<tr><td>58%-67%</td><td class="num">441</td><td class="num">61.3%</td><td class="num">65.3%</td><td class="num pos">+4.0%</td></tr>
+<tr><td>67%-75%</td><td class="num">292</td><td class="num">71.0%</td><td class="num">70.9%</td><td class="num neg">-0.1%</td></tr>
+<tr><td>75%-83%</td><td class="num">103</td><td class="num">79.4%</td><td class="num">81.6%</td><td class="num pos">+2.1%</td></tr>
+<tr><td>83%-92%</td><td class="num">64</td><td class="num">87.4%</td><td class="num">92.2%</td><td class="num pos">+4.8%</td></tr>
+<tr><td>92%-100%</td><td class="num">6</td><td class="num">92.7%</td><td class="num">100.0%</td><td class="num pos">+7.3%</td></tr></tbody>
+  </table></div>
+</div></section>
+
+<section><div class="wrap">
+  <p class="kicker">This week</p>
+  <h2>Open forecasts.</h2>
+  <p class="lede measure">Published before kickoff, timestamped, appended to a
+  log that is never rewritten. Scored whether they land or not.</p>
+  <div class="scroller"><table>
+      <thead><tr><th>Game</th><th>Pick</th><th>Confidence</th><th>Total</th></tr></thead>
+      <tbody><tr><td>NE @ SEA</td><td class="pick">SEA</td><td class="num">61.4%</td><td class="num">44.5</td></tr>
+<tr><td>SF @ LA</td><td class="pick">LA</td><td class="num">61.4%</td><td class="num">48.5</td></tr>
+<tr><td>CHI @ CAR</td><td class="pick">CHI</td><td class="num">58.8%</td><td class="num">47.5</td></tr>
+<tr><td>TB @ CIN</td><td class="pick">CIN</td><td class="num">61.4%</td><td class="num">51.5</td></tr>
+<tr><td>NO @ DET</td><td class="pick">DET</td><td class="num">72.2%</td><td class="num">48.5</td></tr>
+<tr><td>BUF @ HOU</td><td class="pick">BUF</td><td class="num">55.5%</td><td class="num">44.5</td></tr>
+<tr><td>BAL @ IND</td><td class="pick">BAL</td><td class="num">62.1%</td><td class="num">48.5</td></tr>
+<tr><td>CLE @ JAX</td><td class="pick">JAX</td><td class="num">73.6%</td><td class="num">40.5</td></tr>
+<tr><td>ATL @ PIT</td><td class="pick">PIT</td><td class="num">59.8%</td><td class="num">42.5</td></tr>
+<tr><td>NYJ @ TEN</td><td class="pick">TEN</td><td class="num">59.8%</td><td class="num">38.5</td></tr>
+<tr><td>ARI @ LAC</td><td class="pick">LAC</td><td class="num">81.2%</td><td class="num">46.5</td></tr>
+<tr><td>MIA @ LV</td><td class="pick">LV</td><td class="num">61.4%</td><td class="num">40.5</td></tr>
+<tr><td>GB @ MIN</td><td class="pick">MIN</td><td class="num">54.7%</td><td class="num">45.5</td></tr>
+<tr><td>WAS @ PHI</td><td class="pick">PHI</td><td class="num">64.6%</td><td class="num">47.5</td></tr>
+<tr><td>DAL @ NYG</td><td class="pick">DAL</td><td class="num">58.8%</td><td class="num">48.5</td></tr>
+<tr><td>DEN @ KC</td><td class="pick">KC</td><td class="num">59.8%</td><td class="num">42.5</td></tr></tbody></table></div>
+</div></section>
+
+<section><div class="wrap">
+  <p class="kicker">Method</p>
+  <h2>Why you can believe the number.</h2>
+  <div class="method">
+    <div><h3>Leakage firewall</h3><p>Every feature carries the timestamp it
+    became knowable, and there is exactly one sanctioned way to join features to
+    games. A feature that could have seen the future is refused, not warned
+    about.</p></div>
+    <div><h3>Pre-registration</h3><p>6 experiments, each with a
+    hypothesis and a predicted direction written down before the run. The
+    configuration is hashed; changing it and re-running raises an error.</p></div>
+    <div><h3>Sealed holdout</h3><p>1,139 games kept unreadable
+    behind a hash-chained ledger. Opening it is logged permanently and
+    mechanically widens every interval afterwards.</p></div>
+    <div><h3>Placebo nulls</h3><p>A thousand models that know nothing are run
+    through the identical pipeline. If noise reproduces our result, our result is
+    noise — and twice it was.</p></div>
+    <div><h3>Default deny</h3><p>The verdict returns <em>no edge</em> unless
+    every blocking gate passes. The vocabulary stops at <em>edge candidate</em>;
+    nothing in the system can print the word profitable.</p></div>
+    <div><h3>Walk-forward only</h3><p>Models are fitted on prior seasons and
+    scored on the next. Fitting on everything and scoring in-sample inflated one
+    result from +3.5% to +8.9% before the harness caught it.</p></div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <span>&#945; Quant Alpha Lab &middot; 4,292 games in development, 1,139 sealed</span>
+  <span>Built 2026-08-22 20:30 UTC &middot; not betting advice</span>
+</div></footer>
