@@ -1,5 +1,5 @@
 <title>Quant Alpha Lab</title>
-<meta name="description" content="NFL picks and parlays, published before kickoff with the confidence attached.">
+<meta name="description" content="NFL prop edges, game board and parlay slip — projections against the posted line.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,400;0,500;1,6..72,300&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -26,517 +26,401 @@
 }
 *,*::before,*::after { box-sizing:border-box; }
 body { margin:0; background:var(--paper); color:var(--ink);
-  font-family:var(--sans); font-size:16px; line-height:1.6;
+  font-family:var(--sans); font-size:15.5px; line-height:1.55;
   -webkit-font-smoothing:antialiased; }
-.wrap { max-width:60rem; margin:0 auto; padding:0 1.5rem; }
-.measure { max-width:32rem; }
+.wrap { max-width:64rem; margin:0 auto; padding:0 1.25rem; }
 h1,h2,h3 { font-family:var(--serif); font-weight:400; text-wrap:balance; margin:0; }
 a { color:var(--accent); }
-:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 .soft { color:var(--soft); }
+.mono { font-family:var(--mono); font-variant-numeric:tabular-nums; }
 
-.masthead { border-bottom:1px solid var(--rule); }
-.masthead .wrap { display:flex; align-items:baseline; gap:.8rem; padding:1.2rem 1.5rem; }
-.alpha { font-family:var(--serif); font-size:1.75rem; line-height:1; font-style:italic; }
-.wordmark { font-weight:600; letter-spacing:.13em; text-transform:uppercase; font-size:.7rem; }
-.masthead .meta { margin-left:auto; font-family:var(--mono); font-size:.7rem; color:var(--soft); }
+.masthead { border-bottom:1px solid var(--rule); background:var(--paper); }
+.masthead .wrap { display:flex; align-items:baseline; gap:.75rem; padding:1rem 1.25rem .85rem; }
+.alpha { font-family:var(--serif); font-size:1.6rem; line-height:1; font-style:italic; }
+.wordmark { font-weight:600; letter-spacing:.13em; text-transform:uppercase; font-size:.68rem; }
+.masthead .meta { margin-left:auto; font-family:var(--mono); font-size:.68rem; color:var(--soft); }
 
-.hero .wrap { padding:3.5rem 1.5rem 2rem; }
-.eyebrow { font-size:.68rem; letter-spacing:.16em; text-transform:uppercase;
-  color:var(--accent); font-weight:700; margin:0 0 .6rem; }
-.hero h1 { font-size:clamp(2.1rem,5.5vw,3.4rem); line-height:1.05; letter-spacing:-.02em; }
-.hero p { margin:1.1rem 0 0; color:var(--soft); }
+nav.tabs { position:sticky; top:0; z-index:20; background:var(--paper);
+  border-bottom:1px solid var(--rule); }
+nav.tabs .wrap { display:flex; gap:.15rem; overflow-x:auto; padding:0 1.25rem; }
+.tab { appearance:none; background:none; border:0; border-bottom:2px solid transparent;
+  color:var(--soft); font:inherit; font-size:.82rem; font-weight:600; cursor:pointer;
+  padding:.7rem .6rem; white-space:nowrap; }
+.tab:hover { color:var(--ink); }
+.tab[aria-current="page"] { color:var(--ink); border-bottom-color:var(--accent); }
+.tab-n { font-family:var(--mono); font-size:.68rem; color:var(--soft); margin-left:.35rem; }
 
-section { padding:3rem 0 0; }
-section h2 { font-size:1.55rem; letter-spacing:-.01em; }
-.lede { margin:.7rem 0 1.5rem; color:var(--soft); font-size:.95rem; }
+.view { display:none; padding:1.9rem 0 0; }
+.view.on { display:block; }
+.view h2 { font-size:1.45rem; letter-spacing:-.01em; }
+.lede { margin:.55rem 0 1.3rem; color:var(--soft); font-size:.9rem; max-width:36rem; }
+
+.controls { display:flex; gap:.75rem; align-items:center; flex-wrap:wrap;
+  margin-bottom:1rem; font-size:.82rem; color:var(--soft); }
+.controls input[type=range] { width:9rem; accent-color:var(--accent); }
+.controls input[type=search] { font:inherit; padding:.4rem .6rem; min-width:14rem;
+  border:1px solid var(--rule); background:var(--raised); color:var(--ink); }
 
 .scroller { overflow-x:auto; border:1px solid var(--rule); background:var(--raised); }
-table { width:100%; border-collapse:collapse; font-size:.92rem; }
-th,td { text-align:left; padding:.7rem .9rem; border-bottom:1px solid var(--rule);
-  white-space:nowrap; }
-th { font-size:.64rem; letter-spacing:.12em; text-transform:uppercase;
-  color:var(--soft); font-weight:700; }
+table { width:100%; border-collapse:collapse; font-size:.87rem; }
+th,td { text-align:left; padding:.55rem .8rem; border-bottom:1px solid var(--rule); white-space:nowrap; }
+th { font-size:.62rem; letter-spacing:.11em; text-transform:uppercase; color:var(--soft); font-weight:700; }
 tbody tr:last-child td { border-bottom:0; }
-.num { font-family:var(--mono); font-variant-numeric:tabular-nums; text-align:right; }
-.when { font-family:var(--mono); font-size:.78rem; color:var(--soft); }
-.match { font-weight:500; } .at { color:var(--soft); font-weight:400; }
-.pick { font-weight:700; } .price { color:var(--soft); }
-.pos { color:var(--accent); } .neg { color:var(--flag); }
+td.num,th.num { font-family:var(--mono); font-variant-numeric:tabular-nums; text-align:right; }
+.pick { font-weight:700; }
+.pos { color:var(--ours); } .neg { color:var(--price); }
 
-.parlays { display:grid; grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));
-  gap:1rem; }
-.parlay { border:1px solid var(--rule); background:var(--raised); padding:1.1rem; }
-.parlay header { display:flex; justify-content:space-between; align-items:baseline;
-  border-bottom:1px solid var(--rule); padding-bottom:.6rem; }
-.legs-n { font-size:.66rem; letter-spacing:.13em; text-transform:uppercase;
-  font-weight:700; color:var(--soft); }
-.payout { font-family:var(--mono); font-size:1.15rem; font-weight:500; }
-.legs { list-style:none; margin:.75rem 0; padding:0; display:flex;
-  flex-direction:column; gap:.3rem; }
-.legs li { display:flex; justify-content:space-between; font-size:.88rem; }
-.leg-pick { font-weight:600; }
-.leg-conf { font-family:var(--mono); font-size:.8rem; color:var(--soft); }
-.parlay-stats { display:flex; gap:1.1rem; margin:0; padding-top:.7rem;
-  border-top:1px solid var(--rule); }
-.parlay-stats div { display:flex; flex-direction:column; }
-.parlay-stats dt { font-size:.6rem; letter-spacing:.11em; text-transform:uppercase;
+.edge { border:1px solid var(--rule); background:var(--raised); padding:.85rem 1rem;
+  display:grid; grid-template-columns:1fr auto; gap:.6rem 1.2rem; align-items:center;
+  margin-bottom:-1px; }
+.edge:hover { background:color-mix(in srgb,var(--accent) 4%,transparent); }
+.edge-who { font-weight:700; }
+.edge-meta { font-size:.78rem; color:var(--soft); }
+.edge-nums { display:flex; gap:1.1rem; align-items:baseline; }
+.edge-nums div { display:flex; flex-direction:column; align-items:flex-end; }
+.edge-nums .k { font-size:.56rem; letter-spacing:.1em; text-transform:uppercase;
   color:var(--soft); font-weight:700; }
-.parlay-stats dd { margin:.15rem 0 0; font-family:var(--mono); font-size:.92rem; }
+.edge-nums .v { font-family:var(--mono); font-size:.95rem; }
+.edge-nums .gap { font-size:1.15rem; font-weight:500; }
+.addbtn { appearance:none; border:1px solid var(--rule); background:none; color:var(--soft);
+  font:inherit; font-size:.72rem; padding:.3rem .55rem; cursor:pointer; }
+.addbtn:hover { color:var(--accent); border-color:var(--accent); }
+.addbtn[aria-pressed="true"] { color:var(--accent); border-color:var(--accent);
+  background:color-mix(in srgb,var(--accent) 10%,transparent); }
 
-.record { display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));
-  gap:1px; background:var(--rule); border:1px solid var(--rule); margin-bottom:1.5rem; }
-.record > div { background:var(--raised); padding:1.2rem 1.1rem; }
-.record .label { font-size:.62rem; letter-spacing:.13em; text-transform:uppercase;
-  color:var(--soft); font-weight:700; }
-.record .big { font-family:var(--mono); font-size:1.75rem; font-weight:500;
-  letter-spacing:-.02em; margin-top:.3rem; font-variant-numeric:tabular-nums; }
+.range { position:relative; height:5px; background:var(--rule); margin:.45rem 0 .1rem;
+  min-width:8rem; }
+.range i { position:absolute; top:0; bottom:0; background:color-mix(in srgb,var(--ours) 35%,transparent); }
+.range b { position:absolute; top:-3px; width:2px; height:11px; background:var(--ours); }
+.range u { position:absolute; top:-3px; width:2px; height:11px; background:var(--price); }
 
-tr.game { cursor:pointer; transition:background .12s; }
-tr.game:hover { background:color-mix(in srgb,var(--accent) 6%,transparent); }
-tr.game[aria-pressed="true"] { background:color-mix(in srgb,var(--accent) 11%,transparent); }
-tr.game[aria-pressed="true"] .add { transform:rotate(45deg); color:var(--accent); }
-td.add { width:2rem; text-align:center; color:var(--soft); font-family:var(--mono);
-  font-size:1.05rem; transition:transform .15s,color .15s; }
+.gridwrap { display:grid; grid-template-columns:repeat(auto-fill,minmax(9rem,1fr)); gap:1px;
+  background:var(--rule); border:1px solid var(--rule); }
+.gcell { background:var(--raised); padding:.6rem .7rem; }
+.gcell .t { font-weight:700; font-size:.85rem; }
+.gcell .r { display:flex; justify-content:space-between; font-size:.7rem; color:var(--soft);
+  font-family:var(--mono); }
 
-.slip { position:sticky; bottom:0; z-index:5; margin-top:1rem;
-  border:1px solid var(--rule); background:var(--raised);
-  box-shadow:0 -6px 20px rgba(0,0,0,.07); }
+.feeditem { border-bottom:1px solid var(--rule); padding:.7rem 0; display:flex; gap:.8rem; }
+.feeditem .when { font-family:var(--mono); font-size:.7rem; color:var(--soft); min-width:5.5rem; }
+.feeditem .hl { font-weight:600; font-size:.9rem; }
+.feeditem .dt { font-size:.8rem; color:var(--soft); }
+.touch { font-size:.6rem; letter-spacing:.09em; text-transform:uppercase; font-weight:700;
+  color:var(--accent); border:1px solid currentColor; padding:.05rem .3rem; margin-left:.4rem; }
+
+.slip { position:sticky; bottom:0; z-index:15; border:1px solid var(--rule);
+  background:var(--raised); box-shadow:0 -6px 20px rgba(0,0,0,.09); margin-top:1rem; }
 .slip[hidden] { display:none; }
-.slip-head { display:flex; align-items:center; gap:.75rem; padding:.8rem 1rem;
+.slip-head { display:flex; align-items:center; gap:.7rem; padding:.7rem .9rem;
   border-bottom:1px solid var(--rule); }
-.slip-head h3 { font-size:1rem; margin-right:auto; }
-.slip-clear { background:none; border:1px solid var(--rule); color:var(--soft);
-  font:inherit; font-size:.72rem; padding:.25rem .6rem; cursor:pointer; }
-.slip-clear:hover { color:var(--ink); border-color:var(--soft); }
-.slip-body { display:grid; grid-template-columns:1fr auto; gap:1rem;
-  padding:.9rem 1rem 1rem; align-items:start; }
-#slipLegs { list-style:none; margin:0; padding:0; display:flex;
-  flex-direction:column; gap:.28rem; font-size:.88rem; }
-#slipLegs li { display:flex; gap:.6rem; }
-#slipLegs .x { margin-left:auto; color:var(--soft); cursor:pointer;
-  font-family:var(--mono); background:none; border:0; font-size:.85rem; padding:0; }
-#slipLegs .x:hover { color:var(--flag); }
-.slip-out { display:flex; gap:1.3rem; }
-.slip-out div { display:flex; flex-direction:column; min-width:4.5rem; }
-.slip-out dt, .slip-out .k { font-size:.58rem; letter-spacing:.12em;
-  text-transform:uppercase; color:var(--soft); font-weight:700; }
-.slip-out .v { font-family:var(--mono); font-size:1.2rem; font-weight:500;
-  margin-top:.2rem; font-variant-numeric:tabular-nums; }
-.stake-row { display:flex; align-items:center; gap:.5rem; margin-top:.7rem;
-  font-size:.8rem; color:var(--soft); }
-.stake-row input { width:5rem; font:inherit; font-family:var(--mono);
-  padding:.25rem .45rem; border:1px solid var(--rule); background:var(--paper);
-  color:var(--ink); }
-#edgeWarn { margin-top:.6rem; font-size:.8rem; color:var(--flag); min-height:1.2em; }
+.slip-head h3 { font-size:.95rem; margin-right:auto; }
+.btn { appearance:none; background:none; border:1px solid var(--rule); color:var(--soft);
+  font:inherit; font-size:.72rem; padding:.25rem .55rem; cursor:pointer; }
+.btn:hover { color:var(--ink); border-color:var(--soft); }
+.slip-body { display:grid; grid-template-columns:1fr auto; gap:1rem; padding:.8rem .9rem .9rem; }
+#slipLegs { list-style:none; margin:0; padding:0; display:flex; flex-direction:column;
+  gap:.25rem; font-size:.85rem; }
+#slipLegs li { display:flex; gap:.5rem; }
+#slipLegs .x { margin-left:auto; background:none; border:0; color:var(--soft);
+  font-family:var(--mono); cursor:pointer; padding:0; }
+.slip-out { display:flex; gap:1.1rem; }
+.slip-out div { display:flex; flex-direction:column; min-width:4.2rem; }
+.slip-out .k { font-size:.56rem; letter-spacing:.11em; text-transform:uppercase;
+  color:var(--soft); font-weight:700; }
+.slip-out .v { font-family:var(--mono); font-size:1.1rem; margin-top:.15rem; }
+.stake { display:flex; align-items:center; gap:.45rem; margin-top:.6rem;
+  font-size:.78rem; color:var(--soft); }
+.stake input { width:4.5rem; font:inherit; font-family:var(--mono); padding:.2rem .4rem;
+  border:1px solid var(--rule); background:var(--paper); color:var(--ink); }
 
-.gapwrap { border:1px solid var(--rule); background:var(--raised);
-  padding:1.2rem .4rem 1rem; overflow-x:auto; }
-.gapchart { width:100%; min-width:34rem; height:auto; display:block; }
-.gapchart .gl { stroke:var(--rule); stroke-width:1; }
-.gapchart .gt { fill:var(--soft); font-family:var(--mono); font-size:9.5px;
-  text-anchor:middle; }
-.gapchart .gap-team { fill:var(--ink); font-family:var(--sans); font-size:11.5px;
-  font-weight:600; text-anchor:end; }
-.gapchart .gap-val { fill:var(--soft); font-family:var(--mono); font-size:10px; }
-.gapchart .gap-link { stroke:var(--soft); stroke-width:2; opacity:.4; }
-.gapchart .dot-ours { fill:var(--ours); stroke:var(--raised); stroke-width:2; }
-.gapchart .dot-price { fill:var(--price); stroke:var(--raised); stroke-width:2; }
-.gapchart .hit { fill:transparent; }
-.gap-row { cursor:default; outline:none; }
-.gap-row:hover .hit, .gap-row:focus-visible .hit {
-  fill:color-mix(in srgb,var(--accent) 7%,transparent); }
-.gap-row:hover .gap-link { opacity:.8; }
-.legend { display:flex; gap:1.3rem; margin:.9rem 0 0; font-size:.8rem;
-  color:var(--soft); flex-wrap:wrap; align-items:center; }
-.legend b { display:inline-flex; align-items:center; gap:.4rem;
-  font-weight:500; color:var(--ink); }
-.swatch { width:11px; height:11px; border-radius:50%; display:inline-block; }
-.sw-ours { background:var(--ours); } .sw-price { background:var(--price); }
-
-.confbar { display:inline-block; width:2.6rem; height:4px; background:var(--rule);
-  vertical-align:middle; margin-left:.45rem; position:relative; }
-.confbar span { position:absolute; inset:0 auto 0 0; background:var(--ours); }
-
-.note { border-left:2px solid var(--flag); padding:.1rem 0 .1rem 1rem;
-  margin:1.5rem 0 0; font-size:.9rem; color:var(--soft); max-width:34rem; }
-
-footer { margin-top:4rem; border-top:1px solid var(--rule); }
-footer .wrap { padding:1.8rem 1.5rem 2.5rem; display:flex;
-  justify-content:space-between; gap:1rem; flex-wrap:wrap;
-  font-family:var(--mono); font-size:.7rem; color:var(--soft); }
+.caveat { border-left:2px solid var(--flag); padding:.15rem 0 .15rem .9rem;
+  margin:0 0 1.3rem; font-size:.84rem; color:var(--soft); max-width:38rem; }
+.caveat strong { color:var(--ink); font-weight:600; }
+.empty { border:1px dashed var(--rule); padding:1.6rem; text-align:center;
+  color:var(--soft); font-size:.88rem; }
+footer { margin-top:3.5rem; border-top:1px solid var(--rule); }
+footer .wrap { padding:1.5rem 1.25rem 2.5rem; display:flex; justify-content:space-between;
+  gap:1rem; flex-wrap:wrap; font-family:var(--mono); font-size:.68rem; color:var(--soft); }
 @media (prefers-reduced-motion:reduce) { *{animation:none!important;transition:none!important} }
 </style>
 
 <header class="masthead"><div class="wrap">
-  <span class="alpha">&#945;</span>
-  <span class="wordmark">Quant Alpha Lab</span>
-  <span class="meta">16 games on the board</span>
+  <span class="alpha">&#945;</span><span class="wordmark">Quant Alpha Lab</span>
+  <span class="meta">Week 1 &middot; 16 games &middot; 41 props</span>
 </div></header>
 
-<div class="hero"><div class="wrap">
-  <p class="eyebrow">Week 1 &middot; posted before kickoff</p>
-  <h1>Every pick, with the number behind it.</h1>
-  <p class="measure">Strongest call on the board is <strong>LAC</strong> at 81%. Confidence is what it says: over a long run of
-  70% calls, roughly seven in ten land. Nothing here is rounded up.</p>
-</div></div>
+<nav class="tabs"><div class="wrap"><button class="tab" data-view="edges" aria-current="page">Best edges<span class="tab-n" data-count="edges"></span></button><button class="tab" data-view="board">Game board<span class="tab-n" data-count="board"></span></button><button class="tab" data-view="matchups">Matchups<span class="tab-n" data-count="matchups"></span></button><button class="tab" data-view="grid">Off vs def<span class="tab-n" data-count="grid"></span></button><button class="tab" data-view="feed">Feed<span class="tab-n" data-count="feed"></span></button><button class="tab" data-view="search">Search<span class="tab-n" data-count="search"></span></button><button class="tab" data-view="slip">Slip<span class="tab-n" data-count="slip"></span></button></div></nav>
 
-<section><div class="wrap">
-  <h2>What we think, against what you pay</h2>
-  <p class="lede measure">Two dots per game on one probability axis. On 13 of 16 games our number sits below the price, and that distance is the sportsbook&rsquo;s margin. On 3 we come out above it &mdash; those are the only games here the model actually disagrees with the market about.</p>
-  <div class="gapwrap"><svg class="gapchart" viewBox="0 0 720 460" role="list" aria-label="Model probability against price-implied probability"><line class="gl" x1="213.8" y1="14" x2="213.8" y2="434"/><text class="gt" x="213.8" y="8">50%</text><line class="gl" x1="319.6" y1="14" x2="319.6" y2="434"/><text class="gt" x="319.6" y="8">60%</text><line class="gl" x1="425.5" y1="14" x2="425.5" y2="434"/><text class="gt" x="425.5" y="8">70%</text><line class="gl" x1="531.3" y1="14" x2="531.3" y2="434"/><text class="gt" x="531.3" y="8">80%</text><line class="gl" x1="637.1" y1="14" x2="637.1" y2="434"/><text class="gt" x="637.1" y="8">90%</text><g class="gap-row" tabindex="0" role="listitem" aria-label="LAC: we say 81%, price implies 85%"><rect class="hit" x="0" y="15" width="720" height="24"/><text class="gap-team" x="94" y="30">LAC</text><line class="gap-link" x1="544.3" y1="26" x2="586.1" y2="26"/><circle class="dot-price" cx="586.1" cy="26" r="5"/><circle class="dot-ours" cx="544.3" cy="26" r="5"/><text class="gap-val" x="696" y="30">-4</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="JAX: we say 74%, price implies 79%"><rect class="hit" x="0" y="41" width="720" height="24"/><text class="gap-team" x="94" y="56">JAX</text><line class="gap-link" x1="463.5" y1="52" x2="520.1" y2="52"/><circle class="dot-price" cx="520.1" cy="52" r="5"/><circle class="dot-ours" cx="463.5" cy="52" r="5"/><text class="gap-val" x="696" y="56">-5</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="DET: we say 72%, price implies 76%"><rect class="hit" x="0" y="67" width="720" height="24"/><text class="gap-team" x="94" y="82">DET</text><line class="gap-link" x1="448.6" y1="78" x2="484.8" y2="78"/><circle class="dot-price" cx="484.8" cy="78" r="5"/><circle class="dot-ours" cx="448.6" cy="78" r="5"/><text class="gap-val" x="696" y="82">-3</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="PHI: we say 65%, price implies 67%"><rect class="hit" x="0" y="93" width="720" height="24"/><text class="gap-team" x="94" y="108">PHI</text><line class="gap-link" x1="368.5" y1="104" x2="396.0" y2="104"/><circle class="dot-price" cx="396.0" cy="104" r="5"/><circle class="dot-ours" cx="368.5" cy="104" r="5"/><text class="gap-val" x="696" y="108">-3</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="BAL: we say 62%, price implies 65%"><rect class="hit" x="0" y="119" width="720" height="24"/><text class="gap-team" x="94" y="134">BAL</text><line class="gap-link" x1="342.3" y1="130" x2="371.6" y2="130"/><circle class="dot-price" cx="371.6" cy="130" r="5"/><circle class="dot-ours" cx="342.3" cy="130" r="5"/><text class="gap-val" x="696" y="134">-3</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="SEA: we say 61%, price implies 65%"><rect class="hit" x="0" y="145" width="720" height="24"/><text class="gap-team" x="94" y="160">SEA</text><line class="gap-link" x1="334.4" y1="156" x2="371.6" y2="156"/><circle class="dot-price" cx="371.6" cy="156" r="5"/><circle class="dot-ours" cx="334.4" cy="156" r="5"/><text class="gap-val" x="696" y="160">-4</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="LA: we say 61%, price implies 65%"><rect class="hit" x="0" y="171" width="720" height="24"/><text class="gap-team" x="94" y="186">LA</text><line class="gap-link" x1="334.4" y1="182" x2="371.6" y2="182"/><circle class="dot-price" cx="371.6" cy="182" r="5"/><circle class="dot-ours" cx="334.4" cy="182" r="5"/><text class="gap-val" x="696" y="186">-4</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="CIN: we say 61%, price implies 66%"><rect class="hit" x="0" y="197" width="720" height="24"/><text class="gap-team" x="94" y="212">CIN</text><line class="gap-link" x1="334.4" y1="208" x2="387.8" y2="208"/><circle class="dot-price" cx="387.8" cy="208" r="5"/><circle class="dot-ours" cx="334.4" cy="208" r="5"/><text class="gap-val" x="696" y="212">-5</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="LV: we say 61%, price implies 69%"><rect class="hit" x="0" y="223" width="720" height="24"/><text class="gap-team" x="94" y="238">LV</text><line class="gap-link" x1="334.4" y1="234" x2="410.1" y2="234"/><circle class="dot-price" cx="410.1" cy="234" r="5"/><circle class="dot-ours" cx="334.4" cy="234" r="5"/><text class="gap-val" x="696" y="238">-7</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="PIT: we say 60%, price implies 64%"><rect class="hit" x="0" y="249" width="720" height="24"/><text class="gap-team" x="94" y="264">PIT</text><line class="gap-link" x1="317.0" y1="260" x2="358.1" y2="260"/><circle class="dot-price" cx="358.1" cy="260" r="5"/><circle class="dot-ours" cx="317.0" cy="260" r="5"/><text class="gap-val" x="696" y="264">-4</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="TEN: we say 60%, price implies 60%"><rect class="hit" x="0" y="275" width="720" height="24"/><text class="gap-team" x="94" y="290">TEN</text><line class="gap-link" x1="317.0" y1="286" x2="316.2" y2="286"/><circle class="dot-price" cx="316.2" cy="286" r="5"/><circle class="dot-ours" cx="317.0" cy="286" r="5"/><text class="gap-val" x="696" y="290">+0</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="KC: we say 60%, price implies 61%"><rect class="hit" x="0" y="301" width="720" height="24"/><text class="gap-team" x="94" y="316">KC</text><line class="gap-link" x1="317.0" y1="312" x2="327.9" y2="312"/><circle class="dot-price" cx="327.9" cy="312" r="5"/><circle class="dot-ours" cx="317.0" cy="312" r="5"/><text class="gap-val" x="696" y="316">-1</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="CHI: we say 59%, price implies 60%"><rect class="hit" x="0" y="327" width="720" height="24"/><text class="gap-team" x="94" y="342">CHI</text><line class="gap-link" x1="307.4" y1="338" x2="316.2" y2="338"/><circle class="dot-price" cx="316.2" cy="338" r="5"/><circle class="dot-ours" cx="307.4" cy="338" r="5"/><text class="gap-val" x="696" y="342">-1</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="DAL: we say 59%, price implies 60%"><rect class="hit" x="0" y="353" width="720" height="24"/><text class="gap-team" x="94" y="368">DAL</text><line class="gap-link" x1="307.4" y1="364" x2="316.2" y2="364"/><circle class="dot-price" cx="316.2" cy="364" r="5"/><circle class="dot-ours" cx="307.4" cy="364" r="5"/><text class="gap-val" x="696" y="368">-1</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="BUF: we say 55%, price implies 54%"><rect class="hit" x="0" y="379" width="720" height="24"/><text class="gap-team" x="94" y="394">BUF</text><line class="gap-link" x1="271.9" y1="390" x2="257.5" y2="390"/><circle class="dot-price" cx="257.5" cy="390" r="5"/><circle class="dot-ours" cx="271.9" cy="390" r="5"/><text class="gap-val" x="696" y="394">+1</text></g><g class="gap-row" tabindex="0" role="listitem" aria-label="MIN: we say 55%, price implies 54%"><rect class="hit" x="0" y="405" width="720" height="24"/><text class="gap-team" x="94" y="420">MIN</text><line class="gap-link" x1="263.8" y1="416" x2="257.5" y2="416"/><circle class="dot-price" cx="257.5" cy="416" r="5"/><circle class="dot-ours" cx="263.8" cy="416" r="5"/><text class="gap-val" x="696" y="420">+1</text></g></svg></div>
-  <div class="legend">
-    <b><i class="swatch sw-ours"></i>Our probability</b>
-    <b><i class="swatch sw-price"></i>What the price implies</b>
-    <span>Right column: the gap, in points.</span>
+<main class="wrap">
+
+<section class="view on" id="v-edges">
+  <h2>Where our number and the book disagree</h2>
+  <p class="lede">Our projection against the posted line, biggest gap first.
+  41 priced by DraftKings, FanDuel and others.</p>
+  <p class="caveat"><strong>Read the edge column with this next to it.</strong>
+  These are the model disagreeing with the market, not established value. Tested
+  on 1,139 games in a sealed holdout the model had never seen, the disagreements
+  it rated worth backing returned <strong>&minus;16.6%</strong>. A large edge
+  here is most often the model not knowing something the price does &mdash; a
+  changed role, a snap count, a player behind someone new on the depth chart.</p>
+  <div class="controls">
+    <label for="minGap">Minimum gap</label>
+    <input type="range" id="minGap" min="0" max="15" step="0.5" value="0">
+    <span class="mono" id="minGapLabel">0</span>
+    <span id="edgeCount" class="mono"></span>
   </div>
-  <p class="note" style="border-color:var(--rule)">A positive gap is the model
-  disagreeing with the market, not a guaranteed winner. Over four sealed seasons
-  it found 16 such disagreements worth backing, and they returned
-  &minus;16.6%.</p>
-</div></section>
+  <div id="edgeList"></div>
+</section>
 
-<section><div class="wrap">
-  <h2>The card</h2>
-  <p class="lede">Times are UTC. Price is the moneyline on our side.</p>
+<section class="view" id="v-board">
+  <h2>Game board</h2>
+  <p class="lede">Our win probability beside what the moneyline is charging for.
+  Where they agree there is nothing to do.</p>
   <div class="scroller"><table>
-    <thead><tr><th>Kickoff</th><th>Game</th><th>Pick</th>
-      <th class="num">Conf</th><th class="num">Price</th><th class="num">Total</th><th></th></tr></thead>
-    <tbody><tr class="game" data-i="0" tabindex="0" role="button"
-          aria-pressed="false" aria-label="Add SEA to slip">
-        <td class="when">Thu 10 Sep &middot; 00:20</td>
-        <td class="match">NE <span class="at">at</span> SEA</td>
-        <td class="pick">SEA</td>
-        <td class="num">61%<i class="confbar"><span style="width:25%"></span></i></td>
-        <td class="num price">-185</td>
-        <td class="num soft">44.5</td>
-        <td class="add" aria-hidden="true">+</td>
-      </tr>
-<tr class="game" data-i="1" tabindex="0" role="button"
-          aria-pressed="false" aria-label="Add LA to slip">
-        <td class="when">Fri 11 Sep &middot; 00:35</td>
-        <td class="match">SF <span class="at">at</span> LA</td>
-        <td class="pick">LA</td>
-        <td class="num">61%<i class="confbar"><span style="width:25%"></span></i></td>
-        <td class="num price">-185</td>
-        <td class="num soft">48.5</td>
-        <td class="add" aria-hidden="true">+</td>
-      </tr>
-<tr class="game" data-i="2" tabindex="0" role="button"
-          aria-pressed="false" aria-label="Add CHI to slip">
-        <td class="when">Sun 13 Sep &middot; 17:00</td>
-        <td class="match">CHI <span class="at">at</span> CAR</td>
-        <td class="pick">CHI</td>
-        <td class="num">59%<i class="confbar"><span style="width:20%"></span></i></td>
-        <td class="num price">-148</td>
-        <td class="num soft">47.5</td>
-        <td class="add" aria-hidden="true">+</td>
-      </tr>
-<tr class="game" data-i="3" tabindex="0" role="button"
-          aria-pressed="false" aria-label="Add CIN to slip">
-        <td class="when">Sun 13 Sep &middot; 17:00</td>
-        <td class="match">TB <span class="at">at</span> CIN</td>
-        <td class="pick">CIN</td>
-        <td class="num">61%<i class="confbar"><span style="width:25%"></span></i></td>
-        <td class="num price">-198</td>
-        <td class="num soft">51.5</td>
-        <td class="add" aria-hidden="true">+</td>
-      </tr>
-<tr class="game" data-i="4" tabindex="0" role="button"
-          aria-pressed="false" aria-label="Add DET to slip">
-        <td class="when">Sun 13 Sep &middot; 17:00</td>
-        <td class="match">NO <span class="at">at</span> DET</td>
-        <td class="pick">DET</td>
-        <td class="num">72%<i class="confbar"><span style="width:49%"></span></i></td>
-        <td class="num price">-310</td>
-        <td class="num soft">48.5</td>
-        <td class="add" aria-hidden="true">+</td>
-      </tr>
-<tr class="game" data-i="5" tabindex="0" role="button"
-          aria-pressed="false" aria-label="Add BUF to slip">
-        <td class="when">Sun 13 Sep &middot; 17:00</td>
-        <td class="match">BUF <span class="at">at</span> HOU</td>
-        <td class="pick">BUF</td>
-        <td class="num">55%<i class="confbar"><span style="width:12%"></span></i></td>
-        <td class="num price">-118</td>
-        <td class="num soft">44.5</td>
-        <td class="add" aria-hidden="true">+</td>
-      </tr>
-<tr class="game" data-i="6" tabindex="0" role="button"
-          aria-pressed="false" aria-label="Add BAL to slip">
-        <td class="when">Sun 13 Sep &middot; 17:00</td>
-        <td class="match">BAL <span class="at">at</span> IND</td>
-        <td class="pick">BAL</td>
-        <td class="num">62%<i class="confbar"><span style="width:27%"></span></i></td>
-        <td class="num price">-185</td>
-        <td class="num soft">48.5</td>
-        <td class="add" aria-hidden="true">+</td>
-      </tr>
-<tr class="game" data-i="7" tabindex="0" role="button"
-          aria-pressed="false" aria-label="Add JAX to slip">
-        <td class="when">Sun 13 Sep &middot; 17:00</td>
-        <td class="match">CLE <span class="at">at</span> JAX</td>
-        <td class="pick">JAX</td>
-        <td class="num">74%<i class="confbar"><span style="width:52%"></span></i></td>
-        <td class="num price">-375</td>
-        <td class="num soft">40.5</td>
-        <td class="add" aria-hidden="true">+</td>
-      </tr>
-<tr class="game" data-i="8" tabindex="0" role="button"
-          aria-pressed="false" aria-label="Add PIT to slip">
-        <td class="when">Sun 13 Sep &middot; 17:00</td>
-        <td class="match">ATL <span class="at">at</span> PIT</td>
-        <td class="pick">PIT</td>
-        <td class="num">60%<i class="confbar"><span style="width:22%"></span></i></td>
-        <td class="num price">-175</td>
-        <td class="num soft">42.5</td>
-        <td class="add" aria-hidden="true">+</td>
-      </tr>
-<tr class="game" data-i="9" tabindex="0" role="button"
-          aria-pressed="false" aria-label="Add TEN to slip">
-        <td class="when">Sun 13 Sep &middot; 17:00</td>
-        <td class="match">NYJ <span class="at">at</span> TEN</td>
-        <td class="pick">TEN</td>
-        <td class="num">60%<i class="confbar"><span style="width:22%"></span></i></td>
-        <td class="num price">-148</td>
-        <td class="num soft">38.5</td>
-        <td class="add" aria-hidden="true">+</td>
-      </tr>
-<tr class="game" data-i="10" tabindex="0" role="button"
-          aria-pressed="false" aria-label="Add LAC to slip">
-        <td class="when">Sun 13 Sep &middot; 20:25</td>
-        <td class="match">ARI <span class="at">at</span> LAC</td>
-        <td class="pick">LAC</td>
-        <td class="num">81%<i class="confbar"><span style="width:69%"></span></i></td>
-        <td class="num price">-575</td>
-        <td class="num soft">46.5</td>
-        <td class="add" aria-hidden="true">+</td>
-      </tr>
-<tr class="game" data-i="11" tabindex="0" role="button"
-          aria-pressed="false" aria-label="Add LV to slip">
-        <td class="when">Sun 13 Sep &middot; 20:25</td>
-        <td class="match">MIA <span class="at">at</span> LV</td>
-        <td class="pick">LV</td>
-        <td class="num">61%<i class="confbar"><span style="width:25%"></span></i></td>
-        <td class="num price">-218</td>
-        <td class="num soft">40.5</td>
-        <td class="add" aria-hidden="true">+</td>
-      </tr>
-<tr class="game" data-i="12" tabindex="0" role="button"
-          aria-pressed="false" aria-label="Add MIN to slip">
-        <td class="when">Sun 13 Sep &middot; 20:25</td>
-        <td class="match">GB <span class="at">at</span> MIN</td>
-        <td class="pick">MIN</td>
-        <td class="num">55%<i class="confbar"><span style="width:10%"></span></i></td>
-        <td class="num price">-118</td>
-        <td class="num soft">45.5</td>
-        <td class="add" aria-hidden="true">+</td>
-      </tr>
-<tr class="game" data-i="13" tabindex="0" role="button"
-          aria-pressed="false" aria-label="Add PHI to slip">
-        <td class="when">Sun 13 Sep &middot; 20:25</td>
-        <td class="match">WAS <span class="at">at</span> PHI</td>
-        <td class="pick">PHI</td>
-        <td class="num">65%<i class="confbar"><span style="width:32%"></span></i></td>
-        <td class="num price">-205</td>
-        <td class="num soft">47.5</td>
-        <td class="add" aria-hidden="true">+</td>
-      </tr>
-<tr class="game" data-i="14" tabindex="0" role="button"
-          aria-pressed="false" aria-label="Add DAL to slip">
-        <td class="when">Mon 14 Sep &middot; 00:20</td>
-        <td class="match">DAL <span class="at">at</span> NYG</td>
-        <td class="pick">DAL</td>
-        <td class="num">59%<i class="confbar"><span style="width:20%"></span></i></td>
-        <td class="num price">-148</td>
-        <td class="num soft">48.5</td>
-        <td class="add" aria-hidden="true">+</td>
-      </tr>
-<tr class="game" data-i="15" tabindex="0" role="button"
-          aria-pressed="false" aria-label="Add KC to slip">
-        <td class="when">Tue 15 Sep &middot; 00:15</td>
-        <td class="match">DEN <span class="at">at</span> KC</td>
-        <td class="pick">KC</td>
-        <td class="num">60%<i class="confbar"><span style="width:22%"></span></i></td>
-        <td class="num price">-155</td>
-        <td class="num soft">42.5</td>
-        <td class="add" aria-hidden="true">+</td>
-      </tr></tbody>
-  </table></div>
+    <thead><tr><th>Kickoff</th><th>Game</th><th>Pick</th><th class="num">Ours</th>
+      <th class="num">Price</th><th class="num">Implied</th><th class="num">Total</th></tr></thead>
+    <tbody id="boardRows"></tbody></table></div>
+</section>
 
-  <div class="slip" id="slip" hidden>
-    <div class="slip-head">
-      <h3>Your parlay</h3>
-      <button class="slip-clear" id="slipClear" type="button">Clear</button>
+<section class="view" id="v-matchups">
+  <h2>Receiver against defence</h2>
+  <p class="lede">Coverage charting is not public, so this is the honest version:
+  each receiver against the opponent&rsquo;s overall defensive rank. 1 is best.</p>
+  <div id="matchupList"></div>
+</section>
+
+<section class="view" id="v-grid">
+  <h2>Offence against defence</h2>
+  <p class="lede">League rank, 1 best, from last completed season. A strong
+  passing offence against a bottom-five defence is where volume comes from.</p>
+  <div class="gridwrap" id="gridCells"></div>
+</section>
+
+<section class="view" id="v-feed">
+  <h2>Injuries and news</h2>
+  <p class="lede">Anything that changes a projection before kickoff. Items
+  touching a player on the board are flagged.</p>
+  <div id="feedList"></div>
+</section>
+
+<section class="view" id="v-search">
+  <h2>Player search</h2>
+  <p class="lede">Type a name for the line, our number, and the gap.</p>
+  <div class="controls">
+    <input type="search" id="q" placeholder="Search players&hellip;" autocomplete="off">
+  </div>
+  <div id="searchList"></div>
+</section>
+
+<section class="view" id="v-slip">
+  <h2>Your slip</h2>
+  <p class="lede">Combined probability is the product of the legs, using our
+  number rather than the book&rsquo;s implied one.</p>
+  <p class="caveat"><strong>Edge rises with legs here because the legs are
+  modelled as positive.</strong> That is arithmetic, not evidence. On four
+  seasons of sealed data these same disagreements lost money, and stacking
+  losing legs multiplies the loss &mdash; a separate study found parlays
+  out-returning singles in roughly one sample in five purely from skew, which is
+  what a rising number like this usually is.</p>
+  <div id="slipView"></div>
+</section>
+
+</main>
+
+<div class="slip" id="slip" hidden>
+  <div class="slip-head"><h3>Your slip</h3>
+    <button class="btn" id="slipClear" type="button">Clear</button></div>
+  <div class="slip-body">
+    <div><ul id="slipLegs"></ul>
+      <div class="stake"><label for="stake">Stake</label>
+        <input id="stake" type="number" min="1" step="1" value="10"><span id="stakeOut"></span></div>
     </div>
-    <div class="slip-body">
-      <div>
-        <ul id="slipLegs"></ul>
-        <div class="stake-row">
-          <label for="stake">Stake</label>
-          <input id="stake" type="number" min="1" step="1" value="10" inputmode="decimal">
-          <span id="stakeOut"></span>
-        </div>
-        <p id="edgeWarn"></p>
-      </div>
-      <div class="slip-out">
-        <div><span class="k">Hits</span><span class="v" id="slipProb">&mdash;</span></div>
-        <div><span class="k">Odds</span><span class="v" id="slipOdds">&mdash;</span></div>
-        <div><span class="k">Edge</span><span class="v" id="slipEdge">&mdash;</span></div>
-      </div>
+    <div class="slip-out">
+      <div><span class="k">Hits</span><span class="v" id="slipProb">&mdash;</span></div>
+      <div><span class="k">Odds</span><span class="v" id="slipOdds">&mdash;</span></div>
+      <div><span class="k">Edge</span><span class="v" id="slipEdge">&mdash;</span></div>
     </div>
   </div>
-  <p class="lede" style="margin-top:1rem">Tap any game to build your own. The
-  edge figure updates as you add legs &mdash; watch which way it moves.</p>
-</div></section>
-
-<section><div class="wrap">
-  <h2>Parlays</h2>
-  <p class="lede">Built from the most confident calls on the board. Hit rate is
-  the real combined probability, not the sportsbook's implied one.</p>
-  <div class="parlays"><article class="parlay">
-      <header>
-        <span class="legs-n">2 legs</span>
-        <span class="payout">-205</span>
-      </header>
-      <ul class="legs"><li><span class="leg-pick">LAC</span><span class="leg-conf">81%</span></li><li><span class="leg-pick">JAX</span><span class="leg-conf">74%</span></li></ul>
-      <dl class="parlay-stats">
-        <div><dt>Hits</dt><dd>60%</dd></div>
-        <div><dt>Returns</dt><dd>1.49&times;</dd></div>
-        <div><dt>Edge</dt><dd class="neg">-11.1%</dd></div>
-      </dl>
-    </article>
-<article class="parlay">
-      <header>
-        <span class="legs-n">3 legs</span>
-        <span class="payout">-103</span>
-      </header>
-      <ul class="legs"><li><span class="leg-pick">LAC</span><span class="leg-conf">81%</span></li><li><span class="leg-pick">JAX</span><span class="leg-conf">74%</span></li><li><span class="leg-pick">DET</span><span class="leg-conf">72%</span></li></ul>
-      <dl class="parlay-stats">
-        <div><dt>Hits</dt><dd>43%</dd></div>
-        <div><dt>Returns</dt><dd>1.97&times;</dd></div>
-        <div><dt>Edge</dt><dd class="neg">-15.1%</dd></div>
-      </dl>
-    </article>
-<article class="parlay">
-      <header>
-        <span class="legs-n">4 legs</span>
-        <span class="payout">+193</span>
-      </header>
-      <ul class="legs"><li><span class="leg-pick">LAC</span><span class="leg-conf">81%</span></li><li><span class="leg-pick">JAX</span><span class="leg-conf">74%</span></li><li><span class="leg-pick">DET</span><span class="leg-conf">72%</span></li><li><span class="leg-pick">PHI</span><span class="leg-conf">65%</span></li></ul>
-      <dl class="parlay-stats">
-        <div><dt>Hits</dt><dd>28%</dd></div>
-        <div><dt>Returns</dt><dd>2.93&times;</dd></div>
-        <div><dt>Edge</dt><dd class="neg">-18.4%</dd></div>
-      </dl>
-    </article>
-<article class="parlay">
-      <header>
-        <span class="legs-n">5 legs</span>
-        <span class="payout">+351</span>
-      </header>
-      <ul class="legs"><li><span class="leg-pick">LAC</span><span class="leg-conf">81%</span></li><li><span class="leg-pick">JAX</span><span class="leg-conf">74%</span></li><li><span class="leg-pick">DET</span><span class="leg-conf">72%</span></li><li><span class="leg-pick">PHI</span><span class="leg-conf">65%</span></li><li><span class="leg-pick">BAL</span><span class="leg-conf">62%</span></li></ul>
-      <dl class="parlay-stats">
-        <div><dt>Hits</dt><dd>17%</dd></div>
-        <div><dt>Returns</dt><dd>4.51&times;</dd></div>
-        <div><dt>Edge</dt><dd class="neg">-21.9%</dd></div>
-      </dl>
-    </article></div>
-  <p class="note"><strong>Read the edge line.</strong> Stacking legs multiplies
-  the payout and multiplies the house margin with it. We publish the number
-  either way &mdash; when it is negative, that is what the parlay is worth.</p>
-</div></section>
-
-<section><div class="wrap">
-  <h2>The record</h2>
-  <p class="lede">Four seasons of picks, graded. Every game, not a highlight reel.</p>
-  <div class="record">
-    <div><div class="label">Winners called</div><div class="big">67.6%</div></div>
-    <div><div class="label">Games graded</div><div class="big">1,138</div></div>
-    <div><div class="label">Margin error</div><div class="big">9.5</div></div>
-  </div>
-  <div class="scroller"><table>
-    <thead><tr><th>Season</th><th class="num">Games</th><th class="num">Winners called</th></tr></thead>
-    <tbody><tr><td>2022</td><td class="num">283</td><td class="num">66.4%</td></tr>
-<tr><td>2023</td><td class="num">285</td><td class="num">67.4%</td></tr>
-<tr><td>2024</td><td class="num">285</td><td class="num">70.5%</td></tr>
-<tr><td>2025</td><td class="num">285</td><td class="num">66.0%</td></tr></tbody>
-  </table></div>
-</div></section>
+</div>
 
 <footer><div class="wrap">
-  <span>&#945; Quant Alpha Lab</span>
-  <span>Updated 22 Aug 2026 21:05 UTC &middot; 21+ &middot; not betting advice</span>
+  <span>&#945; Quant Alpha Lab &middot; 67.6% of winners called over 1,138 graded games</span>
+  <span>Updated 28 Aug 2026 04:43 UTC &middot; 21+ &middot; not betting advice</span>
 </div></footer>
 
 <script>
 (function () {
-  var CARD = [{"pick": "SEA", "conf": 0.61395, "dec": 1.540541, "price": -185, "game": "NE at SEA"}, {"pick": "LA", "conf": 0.61395, "dec": 1.540541, "price": -185, "game": "SF at LA"}, {"pick": "CHI", "conf": 0.588446, "dec": 1.675676, "price": -148, "game": "CHI at CAR"}, {"pick": "CIN", "conf": 0.61395, "dec": 1.505051, "price": -198, "game": "TB at CIN"}, {"pick": "DET", "conf": 0.721868, "dec": 1.322581, "price": -310, "game": "NO at DET"}, {"pick": "BUF", "conf": 0.554872, "dec": 1.847458, "price": -118, "game": "BUF at HOU"}, {"pick": "BAL", "conf": 0.621381, "dec": 1.540541, "price": -185, "game": "BAL at IND"}, {"pick": "JAX", "conf": 0.735989, "dec": 1.266667, "price": -375, "game": "CLE at JAX"}, {"pick": "PIT", "conf": 0.597507, "dec": 1.571429, "price": -175, "game": "ATL at PIT"}, {"pick": "TEN", "conf": 0.597507, "dec": 1.675676, "price": -148, "game": "NYJ at TEN"}, {"pick": "LAC", "conf": 0.81232, "dec": 1.173913, "price": -575, "game": "ARI at LAC"}, {"pick": "LV", "conf": 0.61395, "dec": 1.458716, "price": -218, "game": "MIA at LV"}, {"pick": "MIN", "conf": 0.547229, "dec": 1.847458, "price": -118, "game": "GB at MIN"}, {"pick": "PHI", "conf": 0.646189, "dec": 1.487805, "price": -205, "game": "WAS at PHI"}, {"pick": "DAL", "conf": 0.588446, "dec": 1.675676, "price": -148, "game": "DAL at NYG"}, {"pick": "KC", "conf": 0.597507, "dec": 1.645161, "price": -155, "game": "DEN at KC"}];
+  var D = {"edges":[{"player":"Malik Nabers","pos":"WR","team":"NYG","opp":"DAL","market":"Total Receiving Yards","line":60.0,"proj":78.2,"gap":18.2,"q10":28.6,"q90":132.6,"price":-118,"book":"betrivers","implied":0.5413,"mp":0.6468,"ev":0.195},{"player":"Christian McCaffrey","pos":"RB","team":"SF","opp":"LA","market":"Total Rushing Yards","line":59.5,"proj":69.3,"gap":9.8,"q10":16.7,"q90":114.5,"price":-114,"book":"fanduel","implied":0.5327,"mp":0.5821,"ev":0.0927},{"player":"TreVeyon Henderson","pos":"RB","team":"NE","opp":"SEA","market":"Total Rushing Yards","line":35.5,"proj":44.9,"gap":9.4,"q10":14.7,"q90":100.1,"price":-114,"book":"fanduel","implied":0.5327,"mp":0.6021,"ev":0.1303},{"player":"Deebo Samuel Sr.","pos":"WR","team":"SF","opp":"LA","market":"Total Receiving Yards","line":31.0,"proj":36.4,"gap":5.4,"q10":10.5,"q90":88.5,"price":-117,"book":"betrivers","implied":0.5392,"mp":0.5713,"ev":0.0596},{"player":"Blake Corum","pos":"RB","team":"LA","opp":"SF","market":"Total Rushing Yards","line":36.5,"proj":41.0,"gap":4.5,"q10":10.0,"q90":97.4,"price":-114,"book":"fanduel","implied":0.5327,"mp":0.5603,"ev":0.0518},{"player":"Kyren Williams","pos":"RB","team":"LA","opp":"SF","market":"Total Rushing Yards","line":57.0,"proj":61.3,"gap":4.3,"q10":23.4,"q90":110.0,"price":-113,"book":"draftkings","implied":0.5305,"mp":0.5499,"ev":0.0366},{"player":"Romeo Doubs","pos":"WR","team":"NE","opp":"SEA","market":"Total Receiving Yards","line":34.0,"proj":36.8,"gap":2.8,"q10":10.9,"q90":90.9,"price":-117,"book":"betrivers","implied":0.5392,"mp":0.5418,"ev":0.0049},{"player":"Hunter Henry","pos":"TE","team":"NE","opp":"SEA","market":"Total Receiving Yards","line":31.5,"proj":33.7,"gap":2.2,"q10":10.7,"q90":79.2,"price":-116,"book":"betonlineag","implied":0.537,"mp":0.5565,"ev":0.0363},{"player":"Rhamondre Stevenson","pos":"RB","team":"NE","opp":"SEA","market":"Total Rushing Yards","line":42.5,"proj":44.2,"gap":1.7,"q10":10.9,"q90":85.9,"price":-114,"book":"fanduel","implied":0.5327,"mp":0.5143,"ev":-0.0345},{"player":"Jaxson Dart","pos":"QB","team":"NYG","opp":"DAL","market":"Total Rushing Yards","line":26.5,"proj":28.0,"gap":1.5,"q10":6.5,"q90":72.3,"price":-114,"book":"fanduel","implied":0.5327,"mp":0.5298,"ev":-0.0055},{"player":"Deebo Samuel Sr.","pos":"WR","team":"SF","opp":"LA","market":"Total Receptions","line":2.5,"proj":3.4,"gap":0.9,"q10":1.1,"q90":7.5,"price":-152,"book":"betrivers","implied":0.6032,"mp":0.6536,"ev":0.0835},{"player":"Sam Darnold","pos":"QB","team":"SEA","opp":"NE","market":"Total Rushing Yards","line":5.5,"proj":6.4,"gap":0.9,"q10":2.7,"q90":29.8,"price":-114,"book":"fanduel","implied":0.5327,"mp":0.4815,"ev":-0.096},{"player":"Malik Nabers","pos":"WR","team":"NYG","opp":"DAL","market":"Total Receptions","line":4.5,"proj":5.4,"gap":0.9,"q10":2.2,"q90":9.3,"price":-157,"book":"betrivers","implied":0.6109,"mp":0.6202,"ev":0.0152},{"player":"AJ Barner","pos":"TE","team":"SEA","opp":"NE","market":"Total Receiving Yards","line":25.0,"proj":25.7,"gap":0.7,"q10":8.3,"q90":69.6,"price":-114,"book":"draftkings","implied":0.5327,"mp":0.5002,"ev":-0.061},{"player":"Hunter Henry","pos":"TE","team":"NE","opp":"SEA","market":"Total Receptions","line":3.0,"proj":3.4,"gap":0.4,"q10":1.1,"q90":6.4,"price":-156,"book":"betonlineag","implied":0.6094,"mp":0.5871,"ev":-0.0365},{"player":"A.J. Brown","pos":"WR","team":"NE","opp":"SEA","market":"Total Receptions","line":4.5,"proj":4.9,"gap":0.4,"q10":2.4,"q90":8.3,"price":-134,"book":"betrivers","implied":0.5726,"mp":0.5983,"ev":0.0448},{"player":"Romeo Doubs","pos":"WR","team":"NE","opp":"SEA","market":"Total Receptions","line":2.5,"proj":2.8,"gap":0.3,"q10":1.0,"q90":5.8,"price":-143,"book":"betrivers","implied":0.5885,"mp":0.573,"ev":-0.0263},{"player":"DeMario Douglas","pos":"WR","team":"NE","opp":"SEA","market":"Total Receptions","line":1.5,"proj":1.7,"gap":0.2,"q10":1.0,"q90":4.8,"price":-158,"book":"fanduel","implied":0.6124,"mp":0.5336,"ev":-0.1287},{"player":"AJ Barner","pos":"TE","team":"SEA","opp":"NE","market":"Total Receptions","line":2.5,"proj":2.7,"gap":0.2,"q10":1.0,"q90":5.6,"price":-141,"book":"betonlineag","implied":0.5851,"mp":0.5065,"ev":-0.1342},{"player":"Mike Evans","pos":"WR","team":"SF","opp":"LA","market":"Total Receptions","line":3.5,"proj":3.6,"gap":0.1,"q10":1.5,"q90":7.5,"price":-130,"book":"fanduel","implied":0.5652,"mp":0.5353,"ev":-0.0529},{"player":"Cooper Kupp","pos":"WR","team":"SEA","opp":"NE","market":"Total Receptions","line":2.5,"proj":2.4,"gap":-0.1,"q10":1.0,"q90":5.6,"price":-136,"book":"betrivers","implied":0.5763,"mp":0.4695,"ev":-0.1853},{"player":"Christian McCaffrey","pos":"RB","team":"SF","opp":"LA","market":"Total Receptions","line":4.5,"proj":4.4,"gap":-0.1,"q10":1.5,"q90":9.1,"price":106,"book":"fanduel","implied":0.4854,"mp":0.4887,"ev":0.0068},{"player":"Jaxon Smith-Njigba","pos":"WR","team":"SEA","opp":"NE","market":"Total Receptions","line":6.5,"proj":6.1,"gap":-0.4,"q10":3.0,"q90":9.9,"price":-102,"book":"fanduel","implied":0.505,"mp":0.4275,"ev":-0.1533},{"player":"Puka Nacua","pos":"WR","team":"LA","opp":"SF","market":"Total Receptions","line":7.5,"proj":7.0,"gap":-0.5,"q10":3.6,"q90":11.2,"price":118,"book":"betrivers","implied":0.4587,"mp":0.4413,"ev":-0.0379},{"player":"George Pickens","pos":"WR","team":"DAL","opp":"NYG","market":"Total Receptions","line":5.0,"proj":4.5,"gap":-0.5,"q10":2.0,"q90":8.1,"price":-165,"book":"betrivers","implied":0.6226,"mp":0.4292,"ev":-0.3106},{"player":"Rashid Shaheed","pos":"WR","team":"SEA","opp":"NE","market":"Total Receptions","line":2.5,"proj":1.9,"gap":-0.6,"q10":1.0,"q90":5.5,"price":-104,"book":"betrivers","implied":0.5098,"mp":0.4041,"ev":-0.2074},{"player":"CeeDee Lamb","pos":"WR","team":"DAL","opp":"NYG","market":"Total Receptions","line":6.5,"proj":4.9,"gap":-1.6,"q10":2.0,"q90":8.7,"price":116,"book":"fanduel","implied":0.463,"mp":0.2995,"ev":-0.353},{"player":"Brock Purdy","pos":"QB","team":"SF","opp":"LA","market":"Total Rushing Yards","line":15.0,"proj":13.3,"gap":-1.7,"q10":3.6,"q90":35.7,"price":-114,"book":"fanduel","implied":0.5327,"mp":0.4456,"ev":-0.1635},{"player":"George Pickens","pos":"WR","team":"DAL","opp":"NYG","market":"Total Receiving Yards","line":69.0,"proj":66.7,"gap":-2.3,"q10":20.3,"q90":124.5,"price":-118,"book":"betrivers","implied":0.5413,"mp":0.4771,"ev":-0.1186},{"player":"DeMario Douglas","pos":"WR","team":"NE","opp":"SEA","market":"Total Receiving Yards","line":21.5,"proj":18.8,"gap":-2.7,"q10":6.5,"q90":64.7,"price":-114,"book":"fanduel","implied":0.5327,"mp":0.4269,"ev":-0.1986},{"player":"Drake Maye","pos":"QB","team":"NE","opp":"SEA","market":"Total Rushing Yards","line":24.5,"proj":21.3,"gap":-3.2,"q10":5.7,"q90":57.6,"price":-114,"book":"fanduel","implied":0.5327,"mp":0.4397,"ev":-0.1746},{"player":"A.J. Brown","pos":"WR","team":"NE","opp":"SEA","market":"Total Receiving Yards","line":61.5,"proj":58.1,"gap":-3.4,"q10":28.3,"q90":119.1,"price":-114,"book":"fanduel","implied":0.5327,"mp":0.4733,"ev":-0.1115},{"player":"Rashid Shaheed","pos":"WR","team":"SEA","opp":"NE","market":"Total Receiving Yards","line":31.0,"proj":25.6,"gap":-5.4,"q10":7.7,"q90":75.7,"price":-113,"book":"betrivers","implied":0.5305,"mp":0.4148,"ev":-0.2182},{"player":"Mike Evans","pos":"WR","team":"SF","opp":"LA","market":"Total Receiving Yards","line":47.5,"proj":41.9,"gap":-5.6,"q10":8.7,"q90":94.5,"price":-115,"book":"betrivers","implied":0.5349,"mp":0.4541,"ev":-0.151},{"player":"Cooper Kupp","pos":"WR","team":"SEA","opp":"NE","market":"Total Receiving Yards","line":31.5,"proj":24.8,"gap":-6.7,"q10":8.1,"q90":71.0,"price":-117,"book":"betrivers","implied":0.5392,"mp":0.3853,"ev":-0.2854},{"player":"Christian McCaffrey","pos":"RB","team":"SF","opp":"LA","market":"Total Receiving Yards","line":37.5,"proj":28.2,"gap":-9.3,"q10":11.4,"q90":81.4,"price":-114,"book":"fanduel","implied":0.5327,"mp":0.412,"ev":-0.2265},{"player":"Jaxon Smith-Njigba","pos":"WR","team":"SEA","opp":"NE","market":"Total Receiving Yards","line":84.5,"proj":71.5,"gap":-13.0,"q10":31.4,"q90":138.8,"price":-117,"book":"betrivers","implied":0.5392,"mp":0.3945,"ev":-0.2683},{"player":"Puka Nacua","pos":"WR","team":"LA","opp":"SF","market":"Total Receiving Yards","line":90.0,"proj":77.0,"gap":-13.0,"q10":34.9,"q90":142.3,"price":-114,"book":"draftkings","implied":0.5327,"mp":0.395,"ev":-0.2584},{"player":"CeeDee Lamb","pos":"WR","team":"DAL","opp":"NYG","market":"Total Receiving Yards","line":76.5,"proj":63.3,"gap":-13.2,"q10":22.1,"q90":120.7,"price":-114,"book":"fanduel","implied":0.5327,"mp":0.3641,"ev":-0.3166},{"player":"George Holani","pos":"RB","team":"SEA","opp":"NE","market":"Total Rushing Yards","line":22.0,"proj":8.1,"gap":-13.9,"q10":2.6,"q90":45.1,"price":-114,"book":"fanduel","implied":0.5327,"mp":0.2145,"ev":-0.5973},{"player":"Javonte Williams","pos":"RB","team":"DAL","opp":"NYG","market":"Total Rushing Yards","line":70.5,"proj":51.1,"gap":-19.4,"q10":18.4,"q90":109.2,"price":-114,"book":"fanduel","implied":0.5327,"mp":0.2917,"ev":-0.4524}],"card":[{"kick":"Thu 10 Sep \u00b7 00:20","away":"NE","home":"SEA","pick":"SEA","conf":0.6139,"implied":0.6491,"price":-185,"dec":1.5405,"spread":3.5,"total":44.5,"over":0.4843},{"kick":"Fri 11 Sep \u00b7 00:35","away":"SF","home":"LA","pick":"LA","conf":0.6139,"implied":0.6491,"price":-185,"dec":1.5405,"spread":3.5,"total":48.5,"over":0.4853},{"kick":"Sun 13 Sep \u00b7 17:00","away":"CHI","home":"CAR","pick":"CHI","conf":0.5884,"implied":0.5968,"price":-148,"dec":1.6757,"spread":-2.5,"total":47.5,"over":0.4868},{"kick":"Sun 13 Sep \u00b7 17:00","away":"TB","home":"CIN","pick":"CIN","conf":0.6139,"implied":0.6644,"price":-198,"dec":1.5051,"spread":3.5,"total":51.5,"over":0.4782},{"kick":"Sun 13 Sep \u00b7 17:00","away":"NO","home":"DET","pick":"DET","conf":0.7219,"implied":0.7561,"price":-310,"dec":1.3226,"spread":7.0,"total":48.5,"over":0.4853},{"kick":"Sun 13 Sep \u00b7 17:00","away":"BUF","home":"HOU","pick":"BUF","conf":0.5549,"implied":0.5413,"price":-118,"dec":1.8475,"spread":-1.5,"total":44.5,"over":0.4843},{"kick":"Sun 13 Sep \u00b7 17:00","away":"BAL","home":"IND","pick":"BAL","conf":0.6214,"implied":0.6491,"price":-185,"dec":1.5405,"spread":-3.5,"total":48.5,"over":0.4853},{"kick":"Sun 13 Sep \u00b7 17:00","away":"CLE","home":"JAX","pick":"JAX","conf":0.736,"implied":0.7895,"price":-375,"dec":1.2667,"spread":7.5,"total":40.5,"over":0.5037},{"kick":"Sun 13 Sep \u00b7 17:00","away":"ATL","home":"PIT","pick":"PIT","conf":0.5975,"implied":0.6364,"price":-175,"dec":1.5714,"spread":3.0,"total":42.5,"over":0.5057},{"kick":"Sun 13 Sep \u00b7 17:00","away":"NYJ","home":"TEN","pick":"TEN","conf":0.5975,"implied":0.5968,"price":-148,"dec":1.6757,"spread":3.0,"total":38.5,"over":0.5075},{"kick":"Sun 13 Sep \u00b7 20:25","away":"ARI","home":"LAC","pick":"LAC","conf":0.8123,"implied":0.8519,"price":-575,"dec":1.1739,"spread":10.5,"total":46.5,"over":0.4929},{"kick":"Sun 13 Sep \u00b7 20:25","away":"MIA","home":"LV","pick":"LV","conf":0.6139,"implied":0.6855,"price":-218,"dec":1.4587,"spread":3.5,"total":40.5,"over":0.5037},{"kick":"Sun 13 Sep \u00b7 20:25","away":"GB","home":"MIN","pick":"MIN","conf":0.5472,"implied":0.5413,"price":-118,"dec":1.8475,"spread":1.5,"total":45.5,"over":0.4865},{"kick":"Sun 13 Sep \u00b7 20:25","away":"WAS","home":"PHI","pick":"PHI","conf":0.6462,"implied":0.6721,"price":-205,"dec":1.4878,"spread":4.5,"total":47.5,"over":0.4868},{"kick":"Mon 14 Sep \u00b7 00:20","away":"DAL","home":"NYG","pick":"DAL","conf":0.5884,"implied":0.5968,"price":-148,"dec":1.6757,"spread":-2.5,"total":48.5,"over":0.4853},{"kick":"Tue 15 Sep \u00b7 00:15","away":"DEN","home":"KC","pick":"KC","conf":0.5975,"implied":0.6078,"price":-155,"dec":1.6452,"spread":3.0,"total":42.5,"over":0.5057}],"matchups":[{"player":"Malik Nabers","pos":"WR","team":"NYG","opp":"DAL","market":"Total Receiving Yards","line":60.0,"proj":78.2,"gap":18.2,"def_rank":1,"pass_off_rank":21},{"player":"Deebo Samuel Sr.","pos":"WR","team":"SF","opp":"LA","market":"Total Receiving Yards","line":31.0,"proj":36.4,"gap":5.4,"def_rank":null,"pass_off_rank":5},{"player":"Romeo Doubs","pos":"WR","team":"NE","opp":"SEA","market":"Total Receiving Yards","line":34.0,"proj":36.8,"gap":2.8,"def_rank":1,"pass_off_rank":4},{"player":"Hunter Henry","pos":"TE","team":"NE","opp":"SEA","market":"Total Receiving Yards","line":31.5,"proj":33.7,"gap":2.2,"def_rank":1,"pass_off_rank":4},{"player":"Deebo Samuel Sr.","pos":"WR","team":"SF","opp":"LA","market":"Total Receptions","line":2.5,"proj":3.4,"gap":0.9,"def_rank":null,"pass_off_rank":5},{"player":"Malik Nabers","pos":"WR","team":"NYG","opp":"DAL","market":"Total Receptions","line":4.5,"proj":5.4,"gap":0.9,"def_rank":1,"pass_off_rank":21},{"player":"AJ Barner","pos":"TE","team":"SEA","opp":"NE","market":"Total Receiving Yards","line":25.0,"proj":25.7,"gap":0.7,"def_rank":1,"pass_off_rank":8},{"player":"Hunter Henry","pos":"TE","team":"NE","opp":"SEA","market":"Total Receptions","line":3.0,"proj":3.4,"gap":0.4,"def_rank":1,"pass_off_rank":4},{"player":"A.J. Brown","pos":"WR","team":"NE","opp":"SEA","market":"Total Receptions","line":4.5,"proj":4.9,"gap":0.4,"def_rank":1,"pass_off_rank":4},{"player":"Romeo Doubs","pos":"WR","team":"NE","opp":"SEA","market":"Total Receptions","line":2.5,"proj":2.8,"gap":0.3,"def_rank":1,"pass_off_rank":4},{"player":"DeMario Douglas","pos":"WR","team":"NE","opp":"SEA","market":"Total Receptions","line":1.5,"proj":1.7,"gap":0.2,"def_rank":1,"pass_off_rank":4},{"player":"AJ Barner","pos":"TE","team":"SEA","opp":"NE","market":"Total Receptions","line":2.5,"proj":2.7,"gap":0.2,"def_rank":1,"pass_off_rank":8},{"player":"Mike Evans","pos":"WR","team":"SF","opp":"LA","market":"Total Receptions","line":3.5,"proj":3.6,"gap":0.1,"def_rank":null,"pass_off_rank":5},{"player":"Cooper Kupp","pos":"WR","team":"SEA","opp":"NE","market":"Total Receptions","line":2.5,"proj":2.4,"gap":-0.1,"def_rank":1,"pass_off_rank":8},{"player":"Jaxon Smith-Njigba","pos":"WR","team":"SEA","opp":"NE","market":"Total Receptions","line":6.5,"proj":6.1,"gap":-0.4,"def_rank":1,"pass_off_rank":8},{"player":"Puka Nacua","pos":"WR","team":"LA","opp":"SF","market":"Total Receptions","line":7.5,"proj":7.0,"gap":-0.5,"def_rank":1,"pass_off_rank":null},{"player":"George Pickens","pos":"WR","team":"DAL","opp":"NYG","market":"Total Receptions","line":5.0,"proj":4.5,"gap":-0.5,"def_rank":1,"pass_off_rank":2},{"player":"Rashid Shaheed","pos":"WR","team":"SEA","opp":"NE","market":"Total Receptions","line":2.5,"proj":1.9,"gap":-0.6,"def_rank":1,"pass_off_rank":8},{"player":"CeeDee Lamb","pos":"WR","team":"DAL","opp":"NYG","market":"Total Receptions","line":6.5,"proj":4.9,"gap":-1.6,"def_rank":1,"pass_off_rank":2},{"player":"George Pickens","pos":"WR","team":"DAL","opp":"NYG","market":"Total Receiving Yards","line":69.0,"proj":66.7,"gap":-2.3,"def_rank":1,"pass_off_rank":2},{"player":"DeMario Douglas","pos":"WR","team":"NE","opp":"SEA","market":"Total Receiving Yards","line":21.5,"proj":18.8,"gap":-2.7,"def_rank":1,"pass_off_rank":4},{"player":"A.J. Brown","pos":"WR","team":"NE","opp":"SEA","market":"Total Receiving Yards","line":61.5,"proj":58.1,"gap":-3.4,"def_rank":1,"pass_off_rank":4},{"player":"Rashid Shaheed","pos":"WR","team":"SEA","opp":"NE","market":"Total Receiving Yards","line":31.0,"proj":25.6,"gap":-5.4,"def_rank":1,"pass_off_rank":8},{"player":"Mike Evans","pos":"WR","team":"SF","opp":"LA","market":"Total Receiving Yards","line":47.5,"proj":41.9,"gap":-5.6,"def_rank":null,"pass_off_rank":5},{"player":"Cooper Kupp","pos":"WR","team":"SEA","opp":"NE","market":"Total Receiving Yards","line":31.5,"proj":24.8,"gap":-6.7,"def_rank":1,"pass_off_rank":8},{"player":"Jaxon Smith-Njigba","pos":"WR","team":"SEA","opp":"NE","market":"Total Receiving Yards","line":84.5,"proj":71.5,"gap":-13.0,"def_rank":1,"pass_off_rank":8},{"player":"Puka Nacua","pos":"WR","team":"LA","opp":"SF","market":"Total Receiving Yards","line":90.0,"proj":77.0,"gap":-13.0,"def_rank":1,"pass_off_rank":null},{"player":"CeeDee Lamb","pos":"WR","team":"DAL","opp":"NYG","market":"Total Receiving Yards","line":76.5,"proj":63.3,"gap":-13.2,"def_rank":1,"pass_off_rank":2}],"ranks":[{"team":"ARI","name":"Arizona Cardinals","pass_off":7,"pass_off_value":232.64706,"rush_off":31,"rush_off_value":93.118,"total_def":1,"total_def_value":0.0,"points_off":23,"points_off_value":20.882},{"team":"ATL","name":"Atlanta Falcons","pass_off":19,"pass_off_value":207.23529,"rush_off":8,"rush_off_value":125.765,"total_def":1,"total_def_value":0.0,"points_off":24,"points_off_value":20.765},{"team":"BAL","name":"Baltimore Ravens","pass_off":27,"pass_off_value":175.58824,"rush_off":2,"rush_off_value":156.588,"total_def":1,"total_def_value":0.0,"points_off":11,"points_off_value":24.941},{"team":"BUF","name":"Buffalo Bills","pass_off":15,"pass_off_value":216.64706,"rush_off":1,"rush_off_value":159.647,"total_def":1,"total_def_value":0.0,"points_off":4,"points_off_value":28.294},{"team":"CAR","name":"Carolina Panthers","pass_off":26,"pass_off_value":179.29411,"rush_off":19,"rush_off_value":116.294,"total_def":1,"total_def_value":0.0,"points_off":27,"points_off_value":18.294},{"team":"CHI","name":"Chicago Bears","pass_off":10,"pass_off_value":225.05882,"rush_off":3,"rush_off_value":144.471,"total_def":1,"total_def_value":0.0,"points_off":9,"points_off_value":25.941},{"team":"CIN","name":"Cincinnati Bengals","pass_off":6,"pass_off_value":235.58824,"rush_off":29,"rush_off_value":93.588,"total_def":1,"total_def_value":0.0,"points_off":12,"points_off_value":24.353},{"team":"CLE","name":"Cleveland Browns","pass_off":31,"pass_off_value":165.17647,"rush_off":27,"rush_off_value":97.0,"total_def":1,"total_def_value":0.0,"points_off":31,"points_off_value":16.412},{"team":"DAL","name":"Dallas Cowboys","pass_off":2,"pass_off_value":266.29413,"rush_off":9,"rush_off_value":125.647,"total_def":1,"total_def_value":0.0,"points_off":7,"points_off_value":27.706},{"team":"DEN","name":"Denver Broncos","pass_off":11,"pass_off_value":223.94118,"rush_off":16,"rush_off_value":118.706,"total_def":1,"total_def_value":0.0,"points_off":14,"points_off_value":23.588},{"team":"DET","name":"Detroit Lions","pass_off":3,"pass_off_value":253.11765,"rush_off":14,"rush_off_value":120.059,"total_def":1,"total_def_value":0.0,"points_off":4,"points_off_value":28.294},{"team":"GB","name":"Green Bay Packers","pass_off":17,"pass_off_value":212.76471,"rush_off":15,"rush_off_value":119.824,"total_def":1,"total_def_value":0.0,"points_off":16,"points_off_value":23.0},{"team":"HOU","name":"Houston Texans","pass_off":14,"pass_off_value":218.05882,"rush_off":22,"rush_off_value":108.941,"total_def":1,"total_def_value":0.0,"points_off":13,"points_off_value":23.765},{"team":"IND","name":"Indianapolis Colts","pass_off":9,"pass_off_value":227.82353,"rush_off":17,"rush_off_value":118.059,"total_def":1,"total_def_value":0.0,"points_off":8,"points_off_value":27.412},{"team":"JAX","name":"Jacksonville Jaguars","pass_off":12,"pass_off_value":222.29411,"rush_off":20,"rush_off_value":115.059,"total_def":1,"total_def_value":0.0,"points_off":6,"points_off_value":27.882},{"team":"KC","name":"Kansas City Chiefs","pass_off":16,"pass_off_value":214.05882,"rush_off":25,"rush_off_value":106.588,"total_def":1,"total_def_value":0.0,"points_off":21,"points_off_value":21.294},{"team":"LV","name":"Las Vegas Raiders","pass_off":28,"pass_off_value":167.70589,"rush_off":32,"rush_off_value":77.471,"total_def":1,"total_def_value":0.0,"points_off":32,"points_off_value":14.176},{"team":"LAC","name":"Los Angeles Chargers","pass_off":18,"pass_off_value":212.23529,"rush_off":12,"rush_off_value":121.588,"total_def":1,"total_def_value":0.0,"points_off":20,"points_off_value":21.647},{"team":"LAR","name":"Los Angeles Rams","pass_off":1,"pass_off_value":268.05884,"rush_off":7,"rush_off_value":126.588,"total_def":1,"total_def_value":0.0,"points_off":1,"points_off_value":30.471},{"team":"MIA","name":"Miami Dolphins","pass_off":25,"pass_off_value":180.47058,"rush_off":13,"rush_off_value":120.235,"total_def":1,"total_def_value":0.0,"points_off":25,"points_off_value":20.412},{"team":"MIN","name":"Minnesota Vikings","pass_off":29,"pass_off_value":166.70589,"rush_off":23,"rush_off_value":108.294,"total_def":1,"total_def_value":0.0,"points_off":26,"points_off_value":20.235},{"team":"NE","name":"New England Patriots","pass_off":4,"pass_off_value":250.47058,"rush_off":6,"rush_off_value":128.882,"total_def":1,"total_def_value":0.0,"points_off":2,"points_off_value":28.824},{"team":"NO","name":"New Orleans Saints","pass_off":13,"pass_off_value":219.29411,"rush_off":28,"rush_off_value":94.294,"total_def":1,"total_def_value":0.0,"points_off":28,"points_off_value":18.0},{"team":"NYG","name":"New York Giants","pass_off":21,"pass_off_value":204.35294,"rush_off":5,"rush_off_value":129.118,"total_def":1,"total_def_value":0.0,"points_off":17,"points_off_value":22.412},{"team":"NYJ","name":"New York Jets","pass_off":32,"pass_off_value":140.29411,"rush_off":10,"rush_off_value":123.294,"total_def":1,"total_def_value":0.0,"points_off":29,"points_off_value":17.647},{"team":"PHI","name":"Philadelphia Eagles","pass_off":23,"pass_off_value":194.29411,"rush_off":18,"rush_off_value":116.941,"total_def":1,"total_def_value":0.0,"points_off":19,"points_off_value":22.294},{"team":"PIT","name":"Pittsburgh Steelers","pass_off":22,"pass_off_value":202.35294,"rush_off":26,"rush_off_value":103.294,"total_def":1,"total_def_value":0.0,"points_off":15,"points_off_value":23.353},{"team":"SF","name":"San Francisco 49ers","pass_off":5,"pass_off_value":244.52942,"rush_off":24,"rush_off_value":106.882,"total_def":1,"total_def_value":0.0,"points_off":10,"points_off_value":25.706},{"team":"SEA","name":"Seattle Seahawks","pass_off":8,"pass_off_value":228.05882,"rush_off":10,"rush_off_value":123.294,"total_def":1,"total_def_value":0.0,"points_off":3,"points_off_value":28.412},{"team":"TB","name":"Tampa Bay Buccaneers","pass_off":20,"pass_off_value":205.88235,"rush_off":21,"rush_off_value":114.529,"total_def":1,"total_def_value":0.0,"points_off":18,"points_off_value":22.353},{"team":"TEN","name":"Tennessee Titans","pass_off":30,"pass_off_value":166.11765,"rush_off":30,"rush_off_value":93.471,"total_def":1,"total_def_value":0.0,"points_off":30,"points_off_value":16.706},{"team":"WSH","name":"Washington Commanders","pass_off":24,"pass_off_value":184.05882,"rush_off":4,"rush_off_value":134.706,"total_def":1,"total_def_value":0.0,"points_off":22,"points_off_value":20.941}],"feed":[{"kind":"injury","time":"2026-08-12","headline":"Blake Corum \u2014 Active","detail":"Los Angeles Rams \u00b7 RB \u00b7 Teammate Kyren Williams said last week that Corum looks \"a lot leaner\" and \"more explosive\" headed into his third season, Nate Atkins of The Athletic reports.","touches":true},{"kind":"injury","time":"2026-08-12","headline":"Kyren Williams \u2014 Active","detail":"Los Angeles Rams \u00b7 RB \u00b7 Williams has been consistently finding holes through the defense at training camp, Brock Vierra of Rams Wire reports.","touches":true},{"kind":"injury","time":"2026-08-14","headline":"DeMario Douglas \u2014 Active","detail":"New England Patriots \u00b7 WR \u00b7 Douglas was among the Patriots' key skill players who didn't play in Thursday's preseason opener against the Colts,  Mark Daniels of masslive.com reports.","touches":true},{"kind":"injury","time":"2026-08-15","headline":"Romeo Doubs \u2014 Active","detail":"New England Patriots \u00b7 WR \u00b7 Doubs was the standout wide receiver during the Patriots' training camp practice Saturday, Taylor Kyles of CLNSMedia.com reports.","touches":true},{"kind":"injury","time":"2026-08-16","headline":"George Holani \u2014 Active","detail":"Seattle Seahawks \u00b7 RB \u00b7 Holani rushed 12 times for 42 yards in the Seahawks' 17-7 preseason loss to the Cowboys on Saturday.","touches":true},{"kind":"injury","time":"2026-08-17","headline":"Rhamondre Stevenson \u2014 Active","detail":"New England Patriots \u00b7 RB \u00b7 Chad Graff of The Athletic predicts that Stevenson and TreVeyon Henderson are likely to share New England's backfield work pretty evenly this coming season.","touches":true},{"kind":"injury","time":"2026-08-17","headline":"Drake Maye \u2014 Active","detail":"New England Patriots \u00b7 QB \u00b7 Maye completed every pass during the first two periods of practice Monday, including a deep ball to A.J. Brown, Taylor Kyles of CLNSMedia.com reports.","touches":true},{"kind":"injury","time":"2026-08-17","headline":"Rashid Shaheed \u2014 Active","detail":"Seattle Seahawks \u00b7 WR \u00b7 Shaheed didn't suit up for Saturday's 17-7 preseason loss to the Cowboys.","touches":true},{"kind":"injury","time":"2026-08-17","headline":"AJ Barner \u2014 Active","detail":"Seattle Seahawks \u00b7 TE \u00b7 Barner was rested for Seattle's 17-7 preseason loss to the Cowboys on Saturday.","touches":true},{"kind":"injury","time":"2026-08-22","headline":"Jaxson Dart \u2014 Active","detail":"New York Giants \u00b7 QB \u00b7 Dart didn't suit up for Saturday's 26-3 preseason win over the Dolphins.","touches":true},{"kind":"injury","time":"2026-08-23","headline":"Malik Nabers \u2014 Questionable","detail":"New York Giants \u00b7 WR \u00b7 Knee - ACL","touches":true},{"kind":"injury","time":"2026-08-23","headline":"Christian McCaffrey \u2014 Questionable","detail":"San Francisco 49ers \u00b7 RB \u00b7 Undisclosed","touches":true},{"kind":"injury","time":"2026-08-24","headline":"Puka Nacua \u2014 Questionable","detail":"Los Angeles Rams \u00b7 WR \u00b7 Groin","touches":true},{"kind":"injury","time":"2026-08-26","headline":"Mike Evans \u2014 Questionable","detail":"San Francisco 49ers \u00b7 WR \u00b7 Groin","touches":true},{"kind":"injury","time":"2026-08-27","headline":"A.J. Brown \u2014 Active","detail":"New England Patriots \u00b7 WR \u00b7 Brown isn't in uniform for Thursday's preseason game in Cleveland, Evan Lazar of the Patriots' official site reports.","touches":true},{"kind":"injury","time":"2026-08-27","headline":"TreVeyon Henderson \u2014 Questionable","detail":"New England Patriots \u00b7 RB \u00b7 Ankle","touches":true},{"kind":"injury","time":"2026-06-10","headline":"Tomon Fox \u2014 Active","detail":"Los Angeles Rams \u00b7 LB \u00b7 The Rams signed Fox on Tuesday.","touches":false},{"kind":"injury","time":"2026-07-28","headline":"Adam Butler \u2014 Active","detail":"Las Vegas Raiders \u00b7 DT","touches":false},{"kind":"injury","time":"2026-07-28","headline":"Maxx Crosby \u2014 Active","detail":"Las Vegas Raiders \u00b7 DE \u00b7 Crosby (knee) has been cleared for the start of training camp and will practice Wednesday, Ryan McFadden of ESPN.com reports.","touches":false},{"kind":"injury","time":"2026-07-29","headline":"Blake Hance \u2014 Active","detail":"Los Angeles Rams \u00b7 G \u00b7 The Rams signed Hance (shoulder) on Tuesday, per the NFL's transaction log.","touches":false},{"kind":"injury","time":"2026-07-30","headline":"Erick All Jr. \u2014 Active","detail":"Cincinnati Bengals \u00b7 TE \u00b7 All (knee) passed his conditioning test and is all set to participate in training camp, Dan Hoard of the Bengals' official site reports.","touches":false},{"kind":"injury","time":"2026-07-30","headline":"Jonathan Allen \u2014 Active","detail":"Cincinnati Bengals \u00b7 DT","touches":false},{"kind":"injury","time":"2026-07-30","headline":"Shemar Stewart \u2014 Questionable","detail":"Cincinnati Bengals \u00b7 DE \u00b7 Knee","touches":false},{"kind":"injury","time":"2026-07-30","headline":"Josh Newton \u2014 Active","detail":"Cincinnati Bengals \u00b7 CB \u00b7 Newton (hamstring) is expected to compete for the Bengals' starting cornerback role, Chris Roling of USA Today reports.","touches":false},{"kind":"injury","time":"2026-07-30","headline":"Connor Lew \u2014 Active","detail":"Cincinnati Bengals \u00b7 C \u00b7 Lew (knee) participated in Cincinnati's training camp Wednesday, Dan Hoard of the team's official site reports.","touches":false},{"kind":"injury","time":"2026-07-30","headline":"Alaric Jackson \u2014 Questionable","detail":"Los Angeles Rams \u00b7 OT \u00b7 Illness","touches":false},{"kind":"injury","time":"2026-07-30","headline":"Jordan Whittington \u2014 Active","detail":"Los Angeles Rams \u00b7 WR \u00b7 Whittington looks like the early leader in the competition for the Rams' No. 3 receiver job, according to Cameron DaSilva of Rams Wire.","touches":false},{"kind":"injury","time":"2026-07-30","headline":"JC Latham \u2014 Active","detail":"Tennessee Titans \u00b7 OT \u00b7 Tennessee took Latham (undisclosed) off its active/PUP list Thursday, Buck Reising of WGFX-FM reports.","touches":false},{"kind":"injury","time":"2026-07-30","headline":"Oluwafemi Oladejo \u2014 Active","detail":"Tennessee Titans \u00b7 DE \u00b7 Oladejo (hamstring) passed his conditioning test and is participating in the Titans' training camp activities, Jim Wyatt of the team's official site reports.","touches":false},{"kind":"injury","time":"2026-08-01","headline":"Mario Goodrich III \u2014 Active","detail":"Tennessee Titans \u00b7 CB \u00b7 The Titans signed Goodrich to a contract Saturday, Jim Wyatt of the team's official site reports.","touches":false},{"kind":"injury","time":"2026-08-01","headline":"Marcus Harris \u2014 Active","detail":"Tennessee Titans \u00b7 CB \u00b7 Harris (knee) has been participating fully in training camp practices, Jim Wyatt of the Titans' official site reports.","touches":false},{"kind":"injury","time":"2026-08-01","headline":"Jeffery Simmons \u2014 Active","detail":"Tennessee Titans \u00b7 DT \u00b7 Simmons (elbow) is participating at the Titans' training camp, George Walker of the Kingsport Times News reports.","touches":false},{"kind":"injury","time":"2026-08-02","headline":"Chris Collier \u2014 Injured Reserve","detail":"Las Vegas Raiders \u00b7 RB \u00b7 Undisclosed","touches":false},{"kind":"injury","time":"2026-08-03","headline":"Joseph Manjack IV \u2014 Active","detail":"Denver Broncos \u00b7 WR \u00b7 Manjack (back) participated in practice Monday, Jon Heath of Broncos Wire reports.","touches":false},{"kind":"injury","time":"2026-08-03","headline":"Tuli Tuipulotu \u2014 Active","detail":"Los Angeles Chargers \u00b7 LB \u00b7 Tuipulotu did not participate in team drills Monday due his ongoing negotiations on an extension, Kris Rhim of ESPN.com reports.","touches":false},{"kind":"injury","time":"2026-08-04","headline":"DeAngelo Malone \u2014 Out","detail":"Atlanta Falcons \u00b7 LB \u00b7 Undisclosed","touches":false},{"kind":"injury","time":"2026-08-04","headline":"Landon Jackson \u2014 Active","detail":"Buffalo Bills \u00b7 DE \u00b7 Jackson (knee) participated in Tuesday's training camp practice, Mike Maynard and Maddy Glab of the Bills' official site report.","touches":false},{"kind":"injury","time":"2026-08-04","headline":"David Walker \u2014 Active","detail":"Tampa Bay Buccaneers \u00b7 LB \u00b7 Walker (knee) passed his physical and is back to full health for training camp, Rick Stroud of the Tampa Bay Times reports.","touches":false},{"kind":"injury","time":"2026-08-06","headline":"C.J. Gardner-Johnson \u2014 Active","detail":"Buffalo Bills \u00b7 S \u00b7 Gardner-Johnson (calf) was a full participant in Thursday's training camp session, Alaina Getzenberg of ESPN.com reports.","touches":false},{"kind":"injury","time":"2026-08-06","headline":"Nik Bonitto \u2014 Active","detail":"Denver Broncos \u00b7 LB \u00b7 Bonitto (leg) participated in Thursday's training camp session, Chris Tomasson of The Denver Gazette reports.","touches":false},{"kind":"injury","time":"2026-08-06","headline":"Matt Peart \u2014 Active","detail":"Denver Broncos \u00b7 OT \u00b7 Peart (knee) participated in Denver's training camp Tuesday.","touches":false},{"kind":"injury","time":"2026-08-06","headline":"Brandon Jones \u2014 Active","detail":"Denver Broncos \u00b7 S \u00b7 Jones (pectoral) is participating at the Broncos' training camp, Gabriel Christus of the team's official site reports.","touches":false},{"kind":"injury","time":"2026-08-06","headline":"Dare Ogunbowale \u2014 Active","detail":"Las Vegas Raiders \u00b7 RB \u00b7 Ogunbowale signed a contract with the Raiders on Wednesday.","touches":false},{"kind":"injury","time":"2026-08-06","headline":"Chris Myarick \u2014 Active","detail":"Las Vegas Raiders \u00b7 TE \u00b7 Las Vegas signed Myarick on Wednesday.","touches":false},{"kind":"injury","time":"2026-08-06","headline":"Kendall Williamson \u2014 Active","detail":"Los Angeles Chargers \u00b7 S \u00b7 Williamson (ankle) participated in the Chargers' training camp Wednesday, Eric Smith of the team's official site reports.","touches":false},{"kind":"injury","time":"2026-08-06","headline":"Al'zillion Hamilton \u2014 Active","detail":"Los Angeles Rams \u00b7 CB \u00b7 The Rams activated Hamilton (undisclosed) from the active/PUP list Wednesday.","touches":false},{"kind":"injury","time":"2026-08-07","headline":"Trevin Wallace \u2014 Active","detail":"Carolina Panthers \u00b7 LB \u00b7 Wallace (shoulder) recorded three tackles during Thursday's 33-30 preseason win at Arizona.","touches":false},{"kind":"injury","time":"2026-08-07","headline":"AJ Dillon \u2014 Active","detail":"Carolina Panthers \u00b7 RB \u00b7 Dillon rushed three times for 18 yards and a touchdown and secured his only target for 18 yards in the Panthers' 33-30 preseason win over the Cardinals on Thursday.","touches":false},{"kind":"injury","time":"2026-08-07","headline":"Trevor Etienne \u2014 Active","detail":"Carolina Panthers \u00b7 RB \u00b7 Etienne started the Panthers' 33-30 preseason win over the Cardinals on Thursday, rushing four times for 12 yards and bringing in his only target for minus-1 yard.","touches":false},{"kind":"injury","time":"2026-08-07","headline":"Kenny Pickett \u2014 Active","detail":"Carolina Panthers \u00b7 QB \u00b7 Pickett started the Hall of Fame Game against the Cardinals on Thursday, completing eight of 11 passes for 62 yards with no touchdowns or interceptions.","touches":false},{"kind":"injury","time":"2026-08-07","headline":"Elic Ayomanor \u2014 Active","detail":"Tennessee Titans \u00b7 WR \u00b7 Ayomanor (shoulder) is practicing Friday, Turron Davenport of ESPN.com reports.","touches":false},{"kind":"injury","time":"2026-08-08","headline":"Jimmy Horn Jr. \u2014 Active","detail":"Carolina Panthers \u00b7 WR \u00b7 Horn caught four passes on seven targets for 44 yards during the Panthers' 33-30 win over the Cardinals in Thursday's Hall of Fame Game. He also returned one kickoff for 25 yards.","touches":false},{"kind":"injury","time":"2026-08-08","headline":"David Moore \u2014 Active","detail":"Carolina Panthers \u00b7 WR \u00b7 Moore caught one pass on two targets for five yards during Carolina's 33-30 win over Arizona in Thursday's Hall of Fame Game.","touches":false},{"kind":"injury","time":"2026-08-08","headline":"Cashius Howell \u2014 Active","detail":"Cincinnati Bengals \u00b7 DE \u00b7 Howell has \"been a monster in camp,\" particularly surprising the Bengals' coaching staff with his strength, Sports Illustrated's Albert Breer reports.","touches":false},{"kind":"injury","time":"2026-08-08","headline":"Kyrese Rowan \u2014 Active","detail":"Denver Broncos \u00b7 WR \u00b7 The Broncos signed Rowan on Friday, Luca Evans of The Denver Post reports.","touches":false},{"kind":"injury","time":"2026-08-09","headline":"Shawn Bowman \u2014 Active","detail":"Arizona Cardinals \u00b7 TE \u00b7 The Cardinals signed Bowman to a contract Sunday, Zach Gershman of the team's official site reports.","touches":false},{"kind":"injury","time":"2026-08-09","headline":"Tershawn Wharton \u2014 Out","detail":"Carolina Panthers \u00b7 DT \u00b7 Neck","touches":false},{"kind":"injury","time":"2026-08-09","headline":"Kyle Trask \u2014 Active","detail":"Carolina Panthers \u00b7 QB \u00b7 The Panthers signed Trask to a contract Sunday, Kassidy Hill of the team's official site reports.","touches":false},{"kind":"injury","time":"2026-08-10","headline":"Dorian Williams \u2014 Active","detail":"Buffalo Bills \u00b7 LB","touches":false},{"kind":"injury","time":"2026-08-10","headline":"Nate Adkins \u2014 Active","detail":"Denver Broncos \u00b7 TE \u00b7 Adkins (undisclosed) participated during the Broncos' training camp practice Monday, Parker Gabriel of The Denver Post reports.","touches":false}]};
   var picked = [];
-  var slip = document.getElementById("slip");
-  var legsEl = document.getElementById("slipLegs");
-  var stakeEl = document.getElementById("stake");
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (t) { var d = document.createElement("div"); d.textContent = t == null ? "" : t; return d.innerHTML; };
+  var pct = function (x) { return x == null ? "\u2014" : Math.round(x * 100) + "%"; };
+  var sign = function (x) { return (x > 0 ? "+" : "") + x.toFixed(1); };
 
-  function american(dec) {
-    return dec >= 2 ? "+" + Math.round((dec - 1) * 100)
-                    : String(Math.round(-100 / (dec - 1)));
-  }
-
-  function render() {
-    slip.hidden = picked.length === 0;
-    legsEl.innerHTML = "";
-    var prob = 1, dec = 1;
-    picked.forEach(function (i) {
-      var c = CARD[i];
-      prob *= c.conf; dec *= c.dec;
-      var li = document.createElement("li");
-      li.innerHTML = '<strong>' + c.pick + '</strong> '
-        + '<span class="leg-conf">' + Math.round(c.conf * 100) + '%</span>';
-      var x = document.createElement("button");
-      x.type = "button"; x.className = "x"; x.textContent = "\u00d7";
-      x.setAttribute("aria-label", "Remove " + c.pick);
-      x.onclick = function () { toggle(i); };
-      li.appendChild(x); legsEl.appendChild(li);
+  // ---- tabs
+  document.querySelectorAll(".tab").forEach(function (t) {
+    t.addEventListener("click", function () {
+      document.querySelectorAll(".tab").forEach(function (o) { o.removeAttribute("aria-current"); });
+      t.setAttribute("aria-current", "page");
+      document.querySelectorAll(".view").forEach(function (v) { v.classList.remove("on"); });
+      var el = $("v-" + t.dataset.view);
+      if (el) el.classList.add("on");
     });
+  });
+  var counts = { edges: D.edges.length, board: D.card.length, matchups: D.matchups.length,
+                 grid: D.ranks.length, feed: D.feed.length, search: D.edges.length, slip: 0 };
+  document.querySelectorAll("[data-count]").forEach(function (s) {
+    var n = counts[s.dataset.count];
+    if (n) s.textContent = n;
+  });
 
-    var edge = picked.length ? prob * dec - 1 : 0;
-    document.getElementById("slipProb").textContent =
-      picked.length ? Math.round(prob * 100) + "%" : "\u2014";
-    document.getElementById("slipOdds").textContent =
-      picked.length ? american(dec) : "\u2014";
-    var eEl = document.getElementById("slipEdge");
-    eEl.textContent = picked.length ? (edge >= 0 ? "+" : "") + (edge * 100).toFixed(1) + "%" : "\u2014";
-    eEl.className = "v " + (edge >= 0 ? "pos" : "neg");
-
-    var stake = parseFloat(stakeEl.value) || 0;
-    document.getElementById("stakeOut").textContent = picked.length
-      ? "returns " + (stake * dec).toFixed(2) + " if it lands"
-      : "";
-
-    var warn = document.getElementById("edgeWarn");
-    warn.textContent = picked.length > 1
-      ? "Each leg you add multiplies the payout \u2014 and the house margin with it."
-      : "";
+  // ---- edges
+  function edgeRow(x, i) {
+    var lo = Math.min(x.q10, x.line), hi = Math.max(x.q90, x.line);
+    var span = Math.max(hi - lo, 1);
+    var l = ((x.line - lo) / span) * 100, p = ((x.proj - lo) / span) * 100;
+    var fill = Math.min(l, p), width = Math.abs(p - l);
+    return '<div class="edge">' +
+      '<div><span class="edge-who">' + esc(x.player) + '</span> ' +
+      '<span class="edge-meta">' + esc(x.pos) + " &middot; " + esc(x.team) + " vs " + esc(x.opp) +
+      " &middot; " + esc(x.market) + '</span>' +
+      '<div class="range"><i style="left:' + fill + '%;width:' + width + '%"></i>' +
+      '<u style="left:' + l + '%"></u><b style="left:' + p + '%"></b></div></div>' +
+      '<div class="edge-nums">' +
+      '<div><span class="k">Line</span><span class="v">' + x.line + '</span></div>' +
+      '<div><span class="k">Ours</span><span class="v">' + x.proj + '</span></div>' +
+      '<div><span class="k">Gap</span><span class="v gap ' + (x.gap >= 0 ? "pos" : "neg") + '">' + sign(x.gap) + '</span></div>' +
+      (x.price != null ? '<div><span class="k">Price</span><span class="v">' + (x.price > 0 ? "+" : "") + x.price + '</span></div>' : "") +
+      (x.mp != null ? '<div><span class="k">Ours %</span><span class="v">' + pct(x.mp) + '</span></div>' : "") +
+      (x.implied != null ? '<div><span class="k">Implied</span><span class="v">' + pct(x.implied) + '</span></div>' : "") +
+      (x.ev != null ? '<div><span class="k">Edge</span><span class="v ' + (x.ev >= 0 ? "pos" : "neg") + '">' + (x.ev >= 0 ? "+" : "") + (x.ev * 100).toFixed(1) + '%</span></div>' : "") +
+      '<button class="addbtn" data-add="' + i + '" aria-pressed="false">Add</button></div></div>';
+  }
+  function renderEdges() {
+    var min = parseFloat($("minGap").value) || 0;
+    var rows = D.edges.filter(function (x) { return Math.abs(x.gap) >= min; });
+    $("minGapLabel").textContent = min;
+    $("edgeCount").textContent = rows.length + " of " + D.edges.length;
+    $("edgeList").innerHTML = rows.length
+      ? rows.map(function (x) { return edgeRow(x, D.edges.indexOf(x)); }).join("")
+      : '<div class="empty">Nothing clears a ' + min + ' point gap. Lower the floor to see thinner edges.</div>';
+    wireAdds();
+  }
+  if (!D.edges.length) {
+    $("edgeList").innerHTML = '<div class="empty">No prop lines posted yet. Books put these up close to kickoff \u2014 check back nearer the weekend.</div>';
+    $("edgeCount").textContent = "0";
+  } else {
+    $("minGap").addEventListener("input", renderEdges);
+    renderEdges();
   }
 
+  // ---- board
+  $("boardRows").innerHTML = D.card.length ? D.card.map(function (c) {
+    return "<tr><td class='mono soft'>" + esc(c.kick) + "</td><td>" + esc(c.away) +
+      " <span class='soft'>at</span> " + esc(c.home) + "</td><td class='pick'>" + esc(c.pick) +
+      "</td><td class='num'>" + pct(c.conf) + "</td><td class='num soft'>" +
+      (c.price > 0 ? "+" : "") + c.price + "</td><td class='num soft'>" + pct(c.implied) +
+      "</td><td class='num soft'>" + c.total + "</td></tr>";
+  }).join("") : "<tr><td colspan='7' class='soft'>No lines posted yet.</td></tr>";
+
+  // ---- matchups
+  $("matchupList").innerHTML = D.matchups.length ? D.matchups.map(function (m) {
+    var r = m.def_rank;
+    var w = r ? (33 - r) / 32 * 100 : 0;
+    return '<div class="edge"><div><span class="edge-who">' + esc(m.player) + "</span> " +
+      '<span class="edge-meta">' + esc(m.pos) + " &middot; " + esc(m.team) + " vs " + esc(m.opp) +
+      (r ? " &middot; defence ranked " + r : " &middot; no rank") + '</span>' +
+      '<div class="range"><i style="left:0;width:' + w + '%"></i></div></div>' +
+      '<div class="edge-nums"><div><span class="k">Line</span><span class="v">' + m.line +
+      '</span></div><div><span class="k">Ours</span><span class="v">' + m.proj +
+      '</span></div><div><span class="k">Gap</span><span class="v gap ' +
+      (m.gap >= 0 ? "pos" : "neg") + '">' + sign(m.gap) + "</span></div></div></div>";
+  }).join("") : '<div class="empty">Needs prop lines and team ranks. Both arrive closer to kickoff.</div>';
+
+  // ---- grid
+  $("gridCells").innerHTML = D.ranks.length ? D.ranks.map(function (r) {
+    function row(label, v) {
+      return '<div class="r"><span>' + label + "</span><span>" + (v == null ? "\u2014" : v) + "</span></div>";
+    }
+    return '<div class="gcell"><div class="t">' + esc(r.team) + "</div>" +
+      row("pass off", r.pass_off) + row("rush off", r.rush_off) +
+      row("total def", r.total_def) + row("pts off", r.points_off) + "</div>";
+  }).join("") : '<div class="empty">Team ranks unavailable.</div>';
+
+  // ---- feed
+  $("feedList").innerHTML = D.feed.length ? D.feed.map(function (f) {
+    return '<div class="feeditem"><span class="when">' + esc(f.time) + "</span><div><div class='hl'>" +
+      esc(f.headline) + (f.touches ? '<span class="touch">on the board</span>' : "") +
+      "</div><div class='dt'>" + esc(f.detail) + "</div></div></div>";
+  }).join("") : '<div class="empty">No injury or news items right now.</div>';
+
+  // ---- search
+  function renderSearch() {
+    var q = ($("q").value || "").toLowerCase().trim();
+    if (!q) { $("searchList").innerHTML = '<div class="empty">Type a name to see his line and our number.</div>'; return; }
+    var hits = D.edges.filter(function (x) { return x.player.toLowerCase().indexOf(q) !== -1; });
+    $("searchList").innerHTML = hits.length
+      ? hits.map(function (x) { return edgeRow(x, D.edges.indexOf(x)); }).join("")
+      : '<div class="empty">No one on the board matches that.</div>';
+    wireAdds();
+  }
+  $("q").addEventListener("input", renderSearch);
+  renderSearch();
+
+  // ---- slip
+  function dec(american) { return american < 0 ? 1 + 100 / Math.abs(american) : 1 + american / 100; }
+  function amer(d) { return d >= 2 ? "+" + Math.round((d - 1) * 100) : String(Math.round(-100 / (d - 1))); }
+  function renderSlip() {
+    $("slip").hidden = picked.length === 0;
+    var prob = 1, dd = 1, priced = true;
+    $("slipLegs").innerHTML = "";
+    picked.forEach(function (i) {
+      var x = D.edges[i];
+      // OUR probability, never the book's implied one. Multiplying implied by
+      // the book's own odds returns 1 minus the vig by construction, so every
+      // slip would read an edge of about zero however good the legs were.
+      if (x.price == null || x.mp == null) priced = false;
+      else { dd *= dec(x.price); prob *= x.mp; }
+      var li = document.createElement("li");
+      li.innerHTML = "<strong>" + esc(x.player) + "</strong> <span class='soft'>" +
+        esc(x.market) + " " + x.line + "</span>";
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "x"; b.textContent = "\u00d7";
+      b.setAttribute("aria-label", "Remove " + x.player);
+      b.onclick = function () { toggle(i); };
+      li.appendChild(b); $("slipLegs").appendChild(li);
+    });
+    $("slipProb").textContent = priced ? pct(prob) : "\u2014";
+    $("slipOdds").textContent = priced ? amer(dd) : "\u2014";
+    var edge = priced ? prob * dd - 1 : null;
+    $("slipEdge").textContent = edge == null ? "\u2014" : (edge >= 0 ? "+" : "") + (edge * 100).toFixed(1) + "%";
+    $("slipEdge").className = "v " + (edge != null && edge < 0 ? "neg" : "pos");
+    var st = parseFloat($("stake").value) || 0;
+    $("stakeOut").textContent = priced ? "returns " + (st * dd).toFixed(2) + " if it lands" : "needs prices";
+    $("slipView").innerHTML = picked.length
+      ? '<div class="empty">' + picked.length + " leg(s) tracked below.</div>"
+      : '<div class="empty">Nothing tracked yet. Add a leg from Best edges.</div>';
+  }
   function toggle(i) {
     var at = picked.indexOf(i);
-    if (at === -1) { picked.push(i); } else { picked.splice(at, 1); }
-    var row = document.querySelector('tr.game[data-i="' + i + '"]');
-    if (row) { row.setAttribute("aria-pressed", at === -1 ? "true" : "false"); }
-    render();
-  }
-
-  document.querySelectorAll("tr.game").forEach(function (row) {
-    var i = parseInt(row.dataset.i, 10);
-    row.addEventListener("click", function () { toggle(i); });
-    row.addEventListener("keydown", function (ev) {
-      if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); toggle(i); }
+    if (at === -1) picked.push(i); else picked.splice(at, 1);
+    document.querySelectorAll('[data-add="' + i + '"]').forEach(function (b) {
+      b.setAttribute("aria-pressed", at === -1 ? "true" : "false");
+      b.textContent = at === -1 ? "Added" : "Add";
     });
-  });
-  stakeEl.addEventListener("input", render);
-  document.getElementById("slipClear").addEventListener("click", function () {
-    picked.slice().forEach(toggle);
-  });
+    renderSlip();
+  }
+  function wireAdds() {
+    document.querySelectorAll("[data-add]").forEach(function (b) {
+      var i = parseInt(b.dataset.add, 10);
+      b.setAttribute("aria-pressed", picked.indexOf(i) === -1 ? "false" : "true");
+      b.textContent = picked.indexOf(i) === -1 ? "Add" : "Added";
+      b.onclick = function () { toggle(i); };
+    });
+  }
+  $("stake").addEventListener("input", renderSlip);
+  $("slipClear").addEventListener("click", function () { picked.slice().forEach(toggle); });
+  renderSlip();
 })();
 </script>
