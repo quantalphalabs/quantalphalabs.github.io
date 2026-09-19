@@ -1,0 +1,68 @@
+<title>Your slip &middot; Quant Alpha Lab</title>
+<meta charset="utf-8">
+<!-- Without this every phone renders the page at a notional 980px and zooms out,
+     so a mobile visitor gets a shrunk desktop layout rather than the responsive
+     one the CSS already describes. The stylesheet was always mobile-capable;
+     nothing was telling the browser to use it. -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Combined probability of your legs, using our number rather than the book&#x27;s.">
+<link rel="canonical" href="https://quantalphalabs.github.io/slip.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="app.css">
+
+<header class="masthead"><div class="wrap">
+  <a class="wordmark-link" href="./"><span class="alpha">&#945;</span><span class="wordmark">Quant Alpha Lab</span></a>
+  <span class="meta">Week 2 &middot; 15 games &middot; 41 props</span>
+</div></header>
+
+<nav class="tabs"><div class="wrap"><div class="seg"><a class="tab" href="./">Best edges<span class="tab-n" data-count="edges"></span></a><a class="tab" href="board.html">Game board<span class="tab-n" data-count="board"></span></a><a class="tab" href="matchups.html">Matchups<span class="tab-n" data-count="matchups"></span></a><a class="tab" href="grid.html">Off vs def<span class="tab-n" data-count="grid"></span></a><a class="tab" href="touchdowns.html">Touchdowns<span class="tab-n" data-count="tds"></span></a><a class="tab" href="feed.html">Feed<span class="tab-n" data-count="feed"></span></a><a class="tab" href="search.html">Search<span class="tab-n" data-count="search"></span></a><a class="tab" href="slip.html" aria-current="page">Slip<span class="tab-n" data-count="slip"></span></a></div></div></nav>
+
+<main class="wrap">
+<section class="view" id="v-slip">
+  <h2>Your slip</h2>
+  <p class="lede">Combined probability is the product of the legs, using our
+  number rather than the book&rsquo;s implied one. Legs follow you from page to
+  page for as long as the tab stays open.</p>
+  <p class="caveat"><strong>Edge rises with legs here because the legs are
+  modelled as positive.</strong> That is arithmetic, not evidence. On four
+  seasons of sealed data these same disagreements lost money, and stacking
+  losing legs multiplies the loss &mdash; a separate study found parlays
+  out-returning singles in roughly one sample in five purely from skew, which is
+  what a rising number like this usually is.</p>
+  <div id="slipView"></div>
+</section>
+</main>
+
+<div class="slip" id="slip" hidden>
+  <div class="slip-head"><h3>Your slip</h3>
+    <button class="btn" id="slipClear" type="button">Clear</button></div>
+  <div class="slip-body">
+    <div><ul id="slipLegs"></ul>
+      <div class="stake"><label for="stake">Stake</label>
+        <input id="stake" type="number" min="1" step="1" value="10"><span id="stakeOut"></span></div>
+    </div>
+    <div class="slip-out">
+      <div><span class="k">Hits</span><span class="v" id="slipProb">&mdash;</span></div>
+      <div><span class="k">Odds</span><span class="v" id="slipOdds">&mdash;</span></div>
+      <div><span class="k">Edge</span><span class="v" id="slipEdge">&mdash;</span></div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <span>&#945; Quant Alpha Lab &middot; 67.6% of winners called over 1,138 graded games</span>
+  <!-- Attribution is a licence condition, not decoration. Every number on this
+       page rests on nflverse data, which is CC-BY 4.0 and requires credit. The
+       README has carried this note since the beginning; the public page, which
+       is the thing actually being distributed, never did. It is in the shared
+       footer, so routing cannot drop it from a page by forgetting one. -->
+  <span>NFL data via <a href="https://nflverse.com">nflverse</a>, CC&#8209;BY&nbsp;4.0
+    &middot; odds via The Odds API and ESPN</span>
+  <span>Updated 19 Sep 2026 05:10 UTC &middot; 21+ &middot; not betting advice</span>
+</div></footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
