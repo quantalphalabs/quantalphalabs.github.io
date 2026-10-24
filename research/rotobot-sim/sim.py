@@ -985,20 +985,7 @@ def main():
 
     if args.backtest:
         lo, hi = (int(x) for x in args.backtest.split("-"))
-        rows = []
-        for wk in range(lo, hi + 1):
-            L = League(D, wk)
-            for _, g in games[(games["week"] == wk) & games["result"].notna()].iterrows():
-                o = run_game(L, D, g, args.sims, keep_typical=False)
-                rows.append({"game_id": g["game_id"], "week": wk, "sim_margin": o["margin_mean"],
-                             "sim_total": o["total_mean"], "sim_home_win": o["home_win"],
-                             "mkt_margin": g["spread_line"], "mkt_total": g["total_line"],
-                             "mkt_home_win": o["market"]["home_win"], "margin": g["result"],
-                             "total": g["total"]})
-                print(f"wk{wk} {g['game_id']:>18}  sim {o['margin_mean']:+5.1f} / {o['total_mean']:5.1f}"
-                      f"  mkt {g['spread_line']:+5.1f} / {g['total_line']:5.1f}"
-                      f"  final {g['result']:+4.0f} / {g['total']:3.0f}", flush=True)
-        bt = pd.DataFrame(rows)
+        bt = backtest(D, games, range(lo, hi + 1), args.sims)
         bt.to_csv(outdir / "backtest.csv", index=False)
         print(summarize_backtest(bt))
         (outdir / "backtest.json").write_text(json.dumps(summarize_backtest(bt, as_dict=True), indent=1))
@@ -1042,11 +1029,31 @@ def involvement(p):
     return sum(p.get(k, [0, 0, 0, 0])[3] for k in ("pass_yds", "rush_yds", "rec_yds"))
 
 
+def backtest(D, games, weeks, sims, quiet=False):
+    """Every finished game in `weeks`, each simulated with only the data from before its week."""
+    rows = []
+    for wk in weeks:
+        L = League(D, wk)
+        for _, g in games[(games["week"] == wk) & games["result"].notna()].iterrows():
+            o = run_game(L, D, g, sims, keep_typical=False)
+            rows.append({"game_id": g["game_id"], "week": wk, "sim_margin": o["margin_mean"],
+                         "sim_total": o["total_mean"], "sim_home_win": o["home_win"],
+                         "mkt_margin": g["spread_line"], "mkt_total": g["total_line"],
+                         "mkt_home_win": o["market"]["home_win"], "margin": g["result"],
+                         "total": g["total"]})
+            if not quiet:
+                print(f"wk{wk} {g['game_id']:>18}  sim {o['margin_mean']:+5.1f} / {o['total_mean']:5.1f}"
+                      f"  mkt {g['spread_line']:+5.1f} / {g['total_line']:5.1f}"
+                      f"  final {g['result']:+4.0f} / {g['total']:3.0f}", flush=True)
+    return pd.DataFrame(rows)
+
+
 def summarize_backtest(bt, as_dict=False):
     bt = bt.dropna(subset=["mkt_home_win"])
     win = (bt["margin"] > 0).astype(float) + 0.5 * (bt["margin"] == 0)
     d = {
         "games": int(len(bt)),
+        "weeks": [int(bt["week"].min()), int(bt["week"].max())],
         "brier_sim": float(((bt["sim_home_win"] - win) ** 2).mean()),
         "brier_market": float(((bt["mkt_home_win"] - win) ** 2).mean()),
         "margin_mae_sim": float((bt["sim_margin"] - bt["margin"]).abs().mean()),

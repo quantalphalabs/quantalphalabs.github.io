@@ -582,7 +582,8 @@ footer a { color:var(--ink-3); }
       return row.map(function (c, j) { return '<span class="' + (i === 0 ? "h" : j === 0 ? "k" : "") + '">' + esc(c) + '</span>'; }).join("");
     }).join("");
     var a = b.ats_w_l_p, o = b.ou_w_l_p;
-    $("btNote").innerHTML = "<strong>" + b.games + " finished games, weeks 3 to 7</strong>, each simulated using only data from before that week. " +
+    var wks = b.weeks ? "weeks " + b.weeks[0] + " to " + b.weeks[1] : "weeks 3 to 7";
+    $("btNote").innerHTML = "<strong>" + b.games + " finished games, " + wks + "</strong>, each simulated using only data from before that week, re-run every week as results come in. " +
       "Lower is better on every row. Against the closing spread the sim's side went " + a[0] + "–" + a[1] + "–" + a[2] +
       ", and on totals " + o[0] + "–" + o[1] + ". That many games cannot separate skill from luck, and the sim runs about " +
       Math.abs(b.total_bias_sim).toFixed(1) + " points light on totals, so its unders are not a signal.";

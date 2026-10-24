@@ -29,6 +29,8 @@ import sim
 ET = ZoneInfo("America/New_York")
 NIGHT_BEFORE_HOUR = 20   # 8pm ET the day before a game day
 PREGAME_HOURS = 2.0      # official inactives come out at 90 minutes; this runs before them
+BACKTEST_FROM_WEEK = 3   # weeks 1-2 have too little current-season data to say anything
+BACKTEST_SIMS = 400
 NFLVERSE = "https://github.com/nflverse/nflverse-data/releases/download"
 ESPN_INJURIES = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/injuries"
 ESPN_TEAM = {"WSH": "WAS", "LAR": "LA", "JAC": "JAX"}  # ESPN abbreviation -> nflverse
@@ -244,6 +246,32 @@ def record_summary(record):
     }
 
 
+def completed_week(g):
+    """Latest regular-season week whose games are all final, or 0."""
+    reg = g[g["game_type"] == "REG"]
+    done = [int(w) for w, sub in reg.groupby("week") if sub["result"].notna().all()]
+    return max(done) if done else 0
+
+
+def backtest_due(g, site):
+    path = site / "data" / "backtest.json"
+    through = json.loads(path.read_text()).get("weeks", [0, 0])[1] if path.exists() else 0
+    return completed_week(g) >= BACKTEST_FROM_WEEK and completed_week(g) > through
+
+
+def refresh_backtest(D, g, site):
+    """Re-runs the out-of-sample backtest through the latest finished week. Each
+    week is simulated with only the data from before it, as on game day."""
+    through = completed_week(g)
+    games = g[g["game_type"] == "REG"]
+    bt = sim.backtest(D, games, range(BACKTEST_FROM_WEEK, through + 1), BACKTEST_SIMS, quiet=True)
+    out = sim.summarize_backtest(bt, as_dict=True)
+    out["sims_per_game"] = BACKTEST_SIMS
+    (site / "data" / "backtest.json").write_text(json.dumps(out, indent=1))
+    bt.to_csv(site / "data" / "backtest.csv", index=False)
+    print(f"backtest refreshed: weeks {BACKTEST_FROM_WEEK}-{through}, {out['games']} games")
+
+
 def bundle(g, site, games_dir, record, now, sims):
     """Writes data/sim-data.js for the page: the current week's games plus the record."""
     open_games = g[g["result"].isna()]
@@ -263,7 +291,9 @@ def bundle(g, site, games_dir, record, now, sims):
         if pd.notna(row["result"]) and "final" not in o:
             o["final"] = {"home": int(row["home_score"]), "away": int(row["away_score"])}
         games.append(o)
-    bt = Path(__file__).with_name("backtest.json")
+    bt = site / "data" / "backtest.json"
+    if not bt.exists():
+        bt = Path(__file__).with_name("backtest.json")
     data = {"season": int(g["season"].iloc[0]), "week": week, "sims": sims,
             "updated_at": now.astimezone(dt.timezone.utc).isoformat(timespec="seconds"),
             "night_hour_et": NIGHT_BEFORE_HOUR, "pregame_hours": PREGAME_HOURS,
@@ -305,10 +335,15 @@ def main():
         jobs = due_jobs(g, manifest, now)
 
     changed = False
-    if jobs:
+    bt_due = backtest_due(g, site)
+    if jobs or bt_due:
         if not args.no_download:
             fetch_data(data_dir, season)
         D = sim.load(data_dir)
+    if bt_due:
+        refresh_backtest(D, g, site)
+        changed = True
+    if jobs:
         try:
             D["live_out"] = espn_out(D)
             inj = "nflverse report + ESPN live feed"

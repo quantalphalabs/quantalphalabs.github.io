@@ -106,6 +106,7 @@ runs find nothing due and stop. Otherwise:
 | --- | --- |
 | 8pm ET the night before each game day | Every game that day, 2,000 sims each, with data through the previous week. |
 | 2 hours before each kickoff | That kickoff's games again, with the latest injury news. The page shows what changed since the night run: players newly ruled out, a starting-QB change, and how far the win probability and total moved. |
+| Once every game in a week is final | The backtest re-runs through that week (each week simulated with only earlier data) and replaces the one on the page. |
 | Once a final score is in | The last run from before kickoff is graded into `sim/data/record.json` and the season record on the page. |
 
 Each simulation keeps its seed between runs, so a pregame run on unchanged information
