@@ -1,0 +1,528 @@
+<title>Snap Sim</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Every snap of this week's NFL games simulated thousands of times from real 2026 play-by-play, with the most typical game replayed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Same identity as the rest of Quant Alpha Lab: monochrome, every number in mono,
+   small labels in letterspaced uppercase. One committed light theme, painted
+   explicitly. Layout: a single column; the near-black hero holds the answer, the
+   field replay sits right under it, detail follows. */
+:root {
+  --bg:#FFFFFF; --sunken:#FAFAFA; --ink-card:#141414;
+  --ink:#111111; --ink-2:#3A3A3A; --ink-3:#6B6B6B; --ink-4:#9A9A9A;
+  --line:#E8E8E8; --line-2:#F0F0F0; --inset:#F6F6F6;
+  --turf:#F3F4F1; --turf-line:#D9DBD5; --zone:#E6E8E2;
+  --font:"Inter",-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --r:10px; --r-lg:14px; --r-sm:6px;
+  --g1:#141414; --g3:#666666; --g5:#B4B4B4; --g6:#D6D6D6; --g7:#EBEBEB;
+  color-scheme: light;
+}
+*,*::before,*::after { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--font);
+  font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; }
+.wrap { max-width:60rem; margin:0 auto;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+h1,h2,h3 { margin:0; font-weight:600; letter-spacing:-.015em; text-wrap:balance; }
+a { color:var(--ink); }
+:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+.mono { font-family:var(--mono); font-variant-numeric:tabular-nums; }
+.lbl { font-family:var(--mono); font-size:9.5px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink-4); }
+
+.masthead .wrap { display:flex; align-items:center; gap:10px; padding-block:20px 0; flex-wrap:wrap; }
+.wordmark { font-weight:600; font-size:14px; }
+.alpha { font-size:17px; }
+.masthead .meta { margin-left:auto; font-family:var(--mono); font-size:10.5px; color:var(--ink-4); }
+
+body::before { content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top, 0px);
+  z-index:30; background:var(--bg); }
+nav.games { position:sticky; top:env(safe-area-inset-top, 0px); z-index:20; background:var(--bg); }
+nav.games .wrap { display:flex; gap:2px; padding-block:14px 10px; overflow-x:auto; scrollbar-width:none; }
+nav.games .wrap::-webkit-scrollbar { display:none; }
+.tab { appearance:none; background:none; border:1px solid transparent; color:var(--ink-3);
+  font:inherit; font-family:var(--mono); font-size:12px; font-weight:500; cursor:pointer;
+  white-space:nowrap; padding:6px 11px; border-radius:999px; flex:0 0 auto; }
+.tab:hover { color:var(--ink); background:var(--sunken); }
+.tab[aria-current="true"] { color:#fff; background:var(--ink-card); }
+
+main { display:flex; flex-direction:column; gap:30px; padding-block:18px 40px; }
+section > h3 { font-size:15px; margin-bottom:4px; }
+.lede { margin:0 0 14px; color:var(--ink-3); font-size:13px; max-width:42rem; }
+
+.hero { background:var(--ink-card); color:#fff; border-radius:var(--r-lg); padding:28px 30px 24px; }
+.hero .lbl { color:rgba(255,255,255,.5); }
+.final { display:flex; align-items:baseline; gap:18px; margin-top:12px; flex-wrap:wrap;
+  font-family:var(--mono); font-variant-numeric:tabular-nums; }
+.final .team { font-size:15px; color:rgba(255,255,255,.66); letter-spacing:.06em; }
+.final .pts { font-size:44px; line-height:1; font-weight:500; }
+.final .dash { color:rgba(255,255,255,.3); font-size:28px; }
+.hero p { margin:14px 0 0; color:rgba(255,255,255,.66); font-size:13px; max-width:40rem; }
+.stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(9.5rem, 1fr)); gap:18px 26px;
+  margin-top:24px; padding-top:20px; border-top:1px solid rgba(255,255,255,.14); }
+.stats .v { font-family:var(--mono); font-size:21px; margin-top:4px; font-variant-numeric:tabular-nums; }
+.stats .s { font-family:var(--mono); font-size:11px; color:rgba(255,255,255,.5); margin-top:2px; }
+
+.board { display:flex; flex-wrap:wrap; gap:8px 22px; align-items:baseline; margin-bottom:10px;
+  font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:12.5px; }
+.board .sc { margin-left:auto; font-size:15px; font-weight:500; }
+.board .sc b { font-weight:500; }
+.board .poss::before { content:"\25B8 "; }
+.field-box { border:1px solid var(--line); border-radius:var(--r); overflow:hidden; background:var(--turf); }
+.field-box svg { display:block; width:100%; height:auto; }
+.ball { transition:transform .45s ease-out; }
+@media (prefers-reduced-motion: reduce) { .ball { transition:none; } }
+.ticker { display:flex; gap:12px; align-items:baseline; margin-top:10px; min-height:2.6em; }
+.ticker .txt { font-size:14px; min-width:0; }
+.ticker .yds { font-family:var(--mono); font-size:12px; color:var(--ink-3); margin-left:auto; white-space:nowrap; }
+.controls { display:flex; gap:8px; align-items:center; margin-top:8px; flex-wrap:wrap; }
+.btn { appearance:none; border:1px solid var(--line); background:var(--bg); color:var(--ink);
+  font:inherit; font-size:12.5px; font-weight:500; padding:6px 12px; border-radius:999px; cursor:pointer; }
+.btn:hover { background:var(--sunken); }
+.btn.primary { background:var(--ink-card); color:#fff; border-color:var(--ink-card); }
+.controls input[type=range] { flex:1 1 12rem; min-width:0; accent-color:var(--ink); }
+.controls select { font:inherit; font-size:12.5px; padding:5px 8px; border:1px solid var(--line);
+  border-radius:999px; background:var(--bg); color:var(--ink); }
+.pos-n { font-family:var(--mono); font-size:11px; color:var(--ink-4); white-space:nowrap; }
+
+.drives { display:flex; flex-direction:column; gap:3px; }
+.drive { display:grid; grid-template-columns:3.4rem 2.2rem 1fr 6.4rem; gap:10px; align-items:center;
+  font-family:var(--mono); font-size:11.5px; font-variant-numeric:tabular-nums; cursor:pointer;
+  border-radius:var(--r-sm); padding:2px 4px; }
+.drive:hover { background:var(--sunken); }
+.drive.now { background:var(--inset); }
+.drive .track { position:relative; height:12px; background:var(--line-2); border-radius:3px; }
+.drive .bar { position:absolute; top:2px; bottom:2px; border-radius:2px; background:var(--g5); }
+.drive .bar.score { background:var(--g1); }
+.drive .bar.away { background:transparent; border:1.5px solid var(--g3); top:1px; bottom:1px; }
+.drive .bar.away.score { border-color:var(--g1); background:repeating-linear-gradient(90deg, var(--g1) 0 2px, transparent 2px 4px); }
+.drive .res { text-align:right; color:var(--ink-3); }
+.drive .res.score { color:var(--ink); font-weight:500; }
+.key { display:flex; gap:16px; flex-wrap:wrap; margin-top:8px; font-size:11.5px; color:var(--ink-3); }
+.key i { display:inline-block; width:18px; height:8px; border-radius:2px; vertical-align:middle; margin-right:6px; }
+
+.dists { display:grid; grid-template-columns:repeat(auto-fit, minmax(17rem, 1fr)); gap:24px; }
+.dist { min-width:0; }
+.dist svg { display:block; width:100%; height:auto; }
+.dist .row { display:flex; gap:10px; align-items:center; margin-top:8px; flex-wrap:wrap; font-size:12.5px; }
+.dist input { width:5.2rem; font-family:var(--mono); font-size:12.5px; padding:4px 8px;
+  border:1px solid var(--line); border-radius:var(--r-sm); background:var(--bg); color:var(--ink); }
+.dist .p { font-family:var(--mono); font-size:15px; margin-left:auto; font-variant-numeric:tabular-nums; }
+
+.tbl-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:var(--r); }
+table { border-collapse:collapse; width:100%; font-size:12.5px; }
+th, td { padding:8px 12px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--line-2); }
+th:first-child, td:first-child { text-align:left; }
+th { font-family:var(--mono); font-size:9.5px; letter-spacing:.13em; text-transform:uppercase;
+  color:var(--ink-4); font-weight:500; background:var(--sunken); }
+td.n { font-family:var(--mono); font-variant-numeric:tabular-nums; }
+td .rng { color:var(--ink-4); font-size:11px; margin-left:6px; }
+td .tm { font-family:var(--mono); color:var(--ink-4); font-size:10.5px; margin-left:6px; }
+tbody tr:last-child td { border-bottom:0; }
+
+.how { display:grid; grid-template-columns:repeat(auto-fit, minmax(15rem, 1fr)); gap:16px 28px; }
+.how ol { margin:0; padding-left:1.2em; display:flex; flex-direction:column; gap:8px;
+  font-size:13px; color:var(--ink-2); max-width:36rem; }
+.how ol b { color:var(--ink); font-weight:600; }
+.bt { display:grid; grid-template-columns:auto auto auto; gap:6px 18px; align-content:start;
+  font-family:var(--mono); font-size:12px; font-variant-numeric:tabular-nums; }
+.bt .h { font-size:9.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-4); }
+.bt .k { font-family:var(--font); color:var(--ink-3); }
+.caveat { border-left:2px solid var(--ink-4); padding:2px 0 2px 14px; margin:14px 0 0;
+  font-size:12.5px; color:var(--ink-3); max-width:44rem; }
+.caveat strong { color:var(--ink); font-weight:600; }
+
+footer .wrap { display:flex; flex-wrap:wrap; gap:6px 18px; padding-block:18px 28px;
+  border-top:1px solid var(--line); font-size:11.5px; color:var(--ink-4); }
+footer a { color:var(--ink-3); }
+@media (max-width:520px) {
+  .hero { padding:22px 18px 20px; }
+  .final .pts { font-size:36px; }
+  .drive { grid-template-columns:2.8rem 1.9rem 1fr 4.8rem; gap:6px; font-size:10.5px; }
+  th, td { padding:7px 9px; }
+}
+</style>
+
+<header class="masthead"><div class="wrap">
+  <span class="alpha">&#945;</span><span class="wordmark">Quant Alpha Lab</span>
+  <span class="lbl" style="margin-left:6px">Snap sim</span>
+  <span class="meta" id="meta"></span>
+</div></header>
+
+<nav class="games" aria-label="Games"><div class="wrap" id="games"></div></nav>
+
+<main class="wrap">
+  <section class="hero" aria-live="polite">
+    <div class="lbl" id="heroLbl">Most typical simulated game</div>
+    <div class="final" id="final"></div>
+    <p id="heroP">Every snap is resampled from real 2026 plays: the ball carrier's own
+    snaps, re-weighted by how this quarterback, this offensive line and this defense
+    shift the outcome. The game shown is the one simulation closest to the median of
+    all of them on score, yards and turnovers.</p>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section aria-label="Replay">
+    <h3>Replay of the typical game</h3>
+    <p class="lede">Play through it snap by snap, or pick a drive below to jump to it.</p>
+    <div class="board" id="board"></div>
+    <div class="field-box"><svg id="field" viewBox="0 0 1200 150" role="img" aria-label="Field with ball position"></svg></div>
+    <div class="ticker"><span class="txt" id="tick"></span><span class="yds" id="tickY"></span></div>
+    <div class="controls">
+      <button class="btn" id="prev" type="button" aria-label="Previous play">&#8592;</button>
+      <button class="btn primary" id="play" type="button">Play</button>
+      <button class="btn" id="next" type="button" aria-label="Next play">&#8594;</button>
+      <select id="speed" aria-label="Speed"><option value="900">1&times;</option><option value="450" selected>2&times;</option><option value="180">5&times;</option></select>
+      <input type="range" id="scrub" min="0" max="0" value="0" aria-label="Play">
+      <span class="pos-n" id="posN"></span>
+    </div>
+  </section>
+
+  <section aria-label="Drives">
+    <h3>Drive chart</h3>
+    <p class="lede" id="driveLede"></p>
+    <div class="drives" id="drives"></div>
+    <div class="key" id="key"></div>
+  </section>
+
+  <section aria-label="Distribution">
+    <h3>All simulations</h3>
+    <p class="lede" id="distLede"></p>
+    <div class="dists">
+      <div class="dist"><div class="lbl" id="mLbl">Margin</div><svg id="mHist" viewBox="0 0 420 150"></svg>
+        <div class="row"><label for="line" id="lineLbl">Line</label><input id="line" type="number" step="0.5"><span class="p" id="pCover"></span></div></div>
+      <div class="dist"><div class="lbl">Total points</div><svg id="tHist" viewBox="0 0 420 150"></svg>
+        <div class="row"><label for="tot">Total</label><input id="tot" type="number" step="0.5"><span class="p" id="pOver"></span></div></div>
+    </div>
+  </section>
+
+  <section aria-label="Players">
+    <h3>Player outcomes</h3>
+    <p class="lede">Median across all simulations, with the 10th to 90th percentile beside it.</p>
+    <div class="tbl-wrap"><table id="players"></table></div>
+  </section>
+
+  <section aria-label="Method">
+    <h3>How it works, and how it has done</h3>
+    <p class="lede">A reconstruction of the method RotoBot describes in its posts
+    (&ldquo;every snap is built from real 2026 play-by-play&rdquo;), written from public
+    nflverse data. None of RotoBot's code, data or app was used.</p>
+    <div class="how">
+      <ol>
+        <li><b>Play call.</b> Pass or run from a league model of down, distance, field position, score and clock, shifted by each offense's own pass rate over expected. Fourth downs follow the league's go, kick and punt rates for that spot.</li>
+        <li><b>Defensive look.</b> The defense blitzes at its own charted rate. Man and zone coverage is not public for 2026, so the blitz is the scheme the sim knows.</li>
+        <li><b>Dropback.</b> Sack, scramble, throw-away or target, combining league rates for that look with the QB's and the defense's.</li>
+        <li><b>Outcome.</b> One of the ball carrier's real plays from a similar down and distance, kept or redrawn according to how this QB, line and defense change that kind of result. The play brings its yards, catch and turnover; the clock comes from real snaps in the same game state.</li>
+      </ol>
+      <div>
+        <div class="bt" id="bt"></div>
+        <p class="caveat" id="btNote"></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <span>NFL data via <a href="https://nflverse.com">nflverse</a>, CC&#8209;BY&nbsp;4.0 &middot; FTN charting via nflverse</span>
+  <span>Not affiliated with RotoBot &middot; 21+ &middot; not betting advice</span>
+</div></footer>
+
+<script src="out/sim-data.js"></script>
+<script>
+(function () {
+  var S = window.SIM;
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (t) { var d = document.createElement("div"); d.textContent = t == null ? "" : t; return d.innerHTML; };
+  var pct = function (x) { return x == null ? "—" : Math.round(x * 100) + "%"; };
+  var fmt = function (x, d) { return x == null ? "—" : x.toFixed(d == null ? 1 : d); };
+  var ord = ["", "1st", "2nd", "3rd", "4th"];
+  var G, plays = [], idx = 0, timer = null;
+
+  if (!S || !S.games || !S.games.length) {
+    $("final").textContent = "No simulation data found. Run sim.py for a week first.";
+    return;
+  }
+  $("meta").textContent = "Week " + S.week + " · " + S.games.length + " games · " +
+    S.sims.toLocaleString() + " sims each · data through week " + S.data_through_week;
+
+  // ---- game picker
+  var hashGame = (location.hash || "").slice(1);
+  S.games.forEach(function (g, i) {
+    var b = document.createElement("button");
+    b.className = "tab"; b.type = "button"; b.textContent = g.away + " @ " + g.home;
+    b.dataset.i = i; b.id = "g-" + g.game_id;
+    b.addEventListener("click", function () { pick(i); });
+    $("games").appendChild(b);
+  });
+
+  function pick(i) {
+    G = S.games[i];
+    document.querySelectorAll(".tab").forEach(function (b) {
+      b.setAttribute("aria-current", String(+b.dataset.i === i));
+    });
+    try { history.replaceState(null, "", "#" + G.game_id); } catch (e) {}
+    stop();
+    renderHero(); buildPlays(); renderDrives(); renderDists(); renderPlayers();
+    go(0);
+  }
+
+  // ---- hero
+  function scores() {
+    var h = [], a = [];
+    for (var k = 0; k < G.scores.length; k += 2) { h.push(G.scores[k]); a.push(G.scores[k + 1]); }
+    return { h: h, a: a };
+  }
+  function median(xs) { var s = xs.slice().sort(function (a, b) { return a - b; }); var m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; }
+
+  function renderHero() {
+    var t = G.typical.score, m = G.market || {};
+    $("heroLbl").textContent = "Most typical of " + G.sims.toLocaleString() + " simulated games" +
+      (G.kickoff ? " · " + G.kickoff + " ET" : "");
+    $("final").innerHTML =
+      '<span class="team">' + esc(G.away) + '</span><span class="pts">' + t.away + '</span>' +
+      '<span class="dash">–</span><span class="pts">' + t.home + '</span><span class="team">' + esc(G.home) + '</span>';
+    var sc = scores();
+    var homeLine = m.spread_home == null ? null : -m.spread_home;
+    var cells = [
+      [G.home + " win", pct(G.home_win), "market " + pct(m.home_win)],
+      ["Median score", median(sc.a) + "–" + median(sc.h), G.away + " – " + G.home],
+      ["Total", fmt(G.total_mean), "market " + (m.total == null ? "—" : fmt(m.total))],
+      ["Over " + (m.total == null ? "" : fmt(m.total)), pct(G.p_over), "share of sims"],
+      [G.home + " " + (homeLine == null ? "" : (homeLine > 0 ? "+" : "") + fmt(homeLine)), pct(G.p_home_cover), "covers, share of sims"]
+    ];
+    $("stats").innerHTML = cells.map(function (c) {
+      return '<div><div class="lbl">' + esc(c[0]) + '</div><div class="v">' + esc(c[1]) + '</div><div class="s">' + esc(c[2]) + '</div></div>';
+    }).join("");
+    var qb = G.qb || {}, miss = G.missing || {};
+    var bits = [];
+    if (qb.away || qb.home) bits.push("Starting QBs: " + (qb.away || "?") + " (" + G.away + "), " + (qb.home || "?") + " (" + G.home + ").");
+    var mm = [].concat((miss.away || []).map(function (n) { return n + " (" + G.away + ")"; }), (miss.home || []).map(function (n) { return n + " (" + G.home + ")"; }));
+    if (mm.length) bits.push("Ruled out from the injury report or roster: " + mm.join(", ") + ".");
+    $("heroP").textContent = "Every snap is resampled from real 2026 plays: the ball carrier's own snaps, re-weighted by how this quarterback, this offensive line and this defense shift the outcome. The game shown is the one simulation closest to the median of all of them on score, yards and turnovers. " + bits.join(" ");
+  }
+
+  // ---- field geometry: home defends the left goal line, x in yards 0..100
+  var X0 = 100, W = 1000; // pixels for the 100 yards between the goal lines
+  function px(x) { return X0 + x * W / 100; }
+  function absX(pos, yl) { return pos === 0 ? 100 - yl : yl; }
+  function spot(off, def, yl) {
+    if (yl <= 0) return def + " end zone";
+    if (yl === 50) return "50";
+    return yl > 50 ? off + " " + (100 - yl) : def + " " + yl;
+  }
+  function team(pos) { return pos === 0 ? G.home : G.away; }
+
+  function drawField() {
+    var s = '<rect x="0" y="0" width="1200" height="150" fill="var(--turf)"/>' +
+      '<rect x="0" y="0" width="' + X0 + '" height="150" fill="var(--zone)"/>' +
+      '<rect x="' + (X0 + W) + '" y="0" width="' + X0 + '" height="150" fill="var(--zone)"/>';
+    for (var y = 0; y <= 100; y += 5) {
+      var x = px(y);
+      s += '<line x1="' + x + '" y1="0" x2="' + x + '" y2="150" stroke="var(--turf-line)" stroke-width="' + (y % 10 ? 1 : 1.6) + '"/>';
+      if (y % 10 === 0 && y > 0 && y < 100) {
+        var n = y <= 50 ? y : 100 - y;
+        s += '<text x="' + x + '" y="138" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="15" fill="var(--ink-4)">' + n + '</text>';
+      }
+    }
+    s += '<text x="' + (X0 / 2) + '" y="80" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="22" font-weight="500" letter-spacing="3" fill="var(--ink-3)" transform="rotate(-90 ' + (X0 / 2) + ' 75)">' + esc(G.home) + '</text>';
+    s += '<text x="' + (X0 * 1.5 + W) + '" y="80" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="22" font-weight="500" letter-spacing="3" fill="var(--ink-3)" transform="rotate(90 ' + (X0 * 1.5 + W) + ' 75)">' + esc(G.away) + '</text>';
+    s += '<line id="los" x1="0" y1="8" x2="0" y2="118" stroke="var(--ink)" stroke-width="2.5"/>';
+    s += '<line id="fd" x1="0" y1="8" x2="0" y2="118" stroke="var(--ink-3)" stroke-width="2" stroke-dasharray="5 4"/>';
+    s += '<g class="ball" id="ball"><ellipse cx="0" cy="63" rx="13" ry="8" fill="var(--ink)"/><line x1="-5" y1="63" x2="5" y2="63" stroke="var(--bg)" stroke-width="1.5"/></g>';
+    s += '<path id="arrow" d="" fill="none" stroke="var(--ink)" stroke-width="1.5"/>';
+    $("field").innerHTML = s;
+  }
+
+  // ---- plays and drives
+  function buildPlays() {
+    plays = G.typical.plays;
+    $("scrub").max = plays.length - 1;
+    drawField();
+  }
+
+  function render() {
+    var p = plays[idx];
+    if (!p) return;
+    var off = team(p.pos), def = team(1 - p.pos);
+    var yl = Math.max(0, p.yl);
+    var x = absX(p.pos, yl);
+    var dir = p.pos === 0 ? 1 : -1;
+    $("ball").style.transform = "translateX(" + px(x) + "px)";
+    $("los").setAttribute("x1", px(x)); $("los").setAttribute("x2", px(x));
+    var showFd = p.kind !== "td" && p.togo < yl && ["kickoff", "punt", "fg"].indexOf(p.kind) < 0;
+    var fx = px(x + dir * p.togo);
+    $("fd").setAttribute("x1", fx); $("fd").setAttribute("x2", fx);
+    $("fd").style.display = showFd ? "" : "none";
+    var gain = p.yds || 0;
+    if (["comp", "run", "scramble", "sack"].indexOf(p.kind) >= 0 && gain) {
+      var x2 = px(Math.max(0, Math.min(100, x + dir * gain)));
+      $("arrow").setAttribute("d", "M" + px(x) + " 95 L" + x2 + " 95 M" + x2 + " 95 l" + (-dir * 7) + " -5 M" + x2 + " 95 l" + (-dir * 7) + " 5");
+    } else {
+      $("arrow").setAttribute("d", "");
+    }
+    var clock = Math.floor(p.t / 60) + ":" + ("0" + (p.t % 60)).slice(-2);
+    var dd = p.kind === "td" ? "" : ord[Math.min(p.down, 4)] + " & " + (p.togo >= yl ? "Goal" : p.togo);
+    $("board").innerHTML =
+      '<span>' + (p.q > 4 ? "OT" : "Q" + p.q) + " " + clock + '</span>' +
+      '<span class="poss">' + esc(off) + (dd ? " · " + dd : "") + '</span>' +
+      '<span>' + esc(spot(off, def, yl)) + '</span>' +
+      '<span class="sc">' + esc(G.away) + ' <b>' + p.score[1] + '</b> · ' + esc(G.home) + ' <b>' + p.score[0] + '</b></span>';
+    $("tick").textContent = p.text;
+    $("tickY").textContent = ["comp", "run", "scramble", "sack"].indexOf(p.kind) >= 0
+      ? (gain > 0 ? "+" : "") + gain + " yds" : (p.kind === "pen" ? (gain > 0 ? "+" : "") + gain + " yds" : "");
+    $("scrub").value = idx;
+    $("posN").textContent = "Play " + (idx + 1) + " of " + plays.length;
+    document.querySelectorAll(".drive").forEach(function (d) {
+      d.classList.toggle("now", +d.dataset.drive === p.drive);
+    });
+  }
+  function go(i) { idx = Math.max(0, Math.min(plays.length - 1, i)); render(); }
+
+  function stop() { if (timer) clearInterval(timer); timer = null; $("play").textContent = "Play"; }
+  function start() {
+    if (idx >= plays.length - 1) go(0);
+    $("play").textContent = "Pause";
+    timer = setInterval(function () {
+      if (idx >= plays.length - 1) { stop(); return; }
+      go(idx + 1);
+    }, +$("speed").value);
+  }
+  $("play").addEventListener("click", function () { timer ? stop() : start(); });
+  $("prev").addEventListener("click", function () { stop(); go(idx - 1); });
+  $("next").addEventListener("click", function () { stop(); go(idx + 1); });
+  $("scrub").addEventListener("input", function () { stop(); go(+this.value); });
+  $("speed").addEventListener("change", function () { if (timer) { stop(); start(); } });
+
+  var RES = { td: "Touchdown", fg_good: "Field goal", fg_miss: "Missed FG", punt: "Punt", int: "Interception",
+              fum: "Fumble", downs: "Downs", kneel: "Kneel", safety: "Safety", half: "End of half" };
+  function driveList() {
+    var out = [], cur = null;
+    plays.forEach(function (p, i) {
+      if (!cur || cur.id !== p.drive) {
+        cur = { id: p.drive, pos: p.pos, q: p.q, first: i, start: p.yl, end: p.yl, res: "half", n: 0 };
+        out.push(cur);
+      }
+      cur.last = i;
+      if (["comp", "inc", "run", "scramble", "sack", "int", "fum"].indexOf(p.kind) >= 0) cur.n++;
+      cur.end = p.kind === "td" ? 0 : (["comp", "run", "scramble", "sack"].indexOf(p.kind) >= 0 ? Math.max(0, p.yl - p.yds) : p.yl);
+      if (p.kind === "td") cur.res = /pick-six|fumble returned|punt returned/.test(p.text) ? "def_td" : "td";
+      else if (p.kind === "fg") cur.res = /no good/.test(p.text) ? "fg_miss" : "fg_good";
+      else if (RES[p.kind]) cur.res = p.kind;
+    });
+    return out;
+  }
+  function renderDrives() {
+    var ds = driveList();
+    var pts = { td: 1, fg_good: 1 };
+    $("drives").innerHTML = ds.map(function (d) {
+      var a = absX(d.pos, d.start), b = absX(d.pos, Math.max(0, d.end));
+      var lo = Math.min(a, b), hi = Math.max(a, b);
+      var cls = (d.pos === 1 ? " away" : "") + (pts[d.res] ? " score" : "");
+      var label = d.res === "def_td" ? "Return TD" : RES[d.res] || d.res;
+      return '<div class="drive" data-drive="' + d.id + '" data-first="' + d.first + '" role="button" tabindex="0">' +
+        '<span>' + (d.q > 4 ? "OT" : "Q" + d.q) + '</span><span>' + esc(team(d.pos)) + '</span>' +
+        '<span class="track"><span class="bar' + cls + '" style="left:' + lo + '%;width:' + Math.max(0.8, hi - lo) + '%"></span></span>' +
+        '<span class="res' + (pts[d.res] ? " score" : "") + '">' + esc(label) + '</span></div>';
+    }).join("");
+    document.querySelectorAll(".drive").forEach(function (el) {
+      var jump = function () { stop(); go(+el.dataset.first); };
+      el.addEventListener("click", jump);
+      el.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); jump(); } });
+    });
+    $("driveLede").textContent = ds.length + " possessions. Bars run from where each drive started to where it ended, on a field with " +
+      G.home + "'s end zone on the left.";
+    $("key").innerHTML = '<span><i style="background:var(--g5)"></i>' + esc(G.home) + ' drive</span>' +
+      '<span><i style="border:1.5px solid var(--g3)"></i>' + esc(G.away) + ' drive</span>' +
+      '<span><i style="background:var(--g1)"></i>Scoring drive</span>';
+  }
+
+  // ---- distributions
+  function hist(svg, vals, lo, hi, marker, sideFn) {
+    var n = hi - lo + 1, counts = new Array(n).fill(0);
+    vals.forEach(function (v) { counts[Math.max(0, Math.min(n - 1, v - lo))]++; });
+    var max = Math.max.apply(null, counts), w = 400 / n, h = 110;
+    var s = '';
+    counts.forEach(function (c, i) {
+      var bh = c / max * h, v = lo + i;
+      s += '<rect x="' + (10 + i * w).toFixed(2) + '" y="' + (12 + h - bh).toFixed(2) + '" width="' + Math.max(0.5, w - 0.6).toFixed(2) +
+        '" height="' + bh.toFixed(2) + '" fill="' + (sideFn(v) ? "var(--g1)" : "var(--g6)") + '"/>';
+    });
+    s += '<line x1="10" y1="122.5" x2="410" y2="122.5" stroke="var(--line)"/>';
+    var ticks = [];
+    for (var t = Math.ceil(lo / 10) * 10; t <= hi; t += 10) ticks.push(t);
+    ticks.forEach(function (t) {
+      var x = 10 + (t - lo + 0.5) * w;
+      s += '<text x="' + x.toFixed(1) + '" y="140" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-4)">' + (t > 0 && lo < 0 ? "+" + t : t) + '</text>';
+    });
+    if (marker != null) {
+      var mx = 10 + (marker - lo + 0.5) * w;
+      s += '<line x1="' + mx.toFixed(1) + '" y1="4" x2="' + mx.toFixed(1) + '" y2="123" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3 3"/>';
+    }
+    svg.innerHTML = s;
+  }
+  function renderDists() {
+    var sc = scores(), m = G.market || {};
+    var margin = sc.h.map(function (h, i) { return h - sc.a[i]; });
+    var total = sc.h.map(function (h, i) { return h + sc.a[i]; });
+    $("mLbl").textContent = "Margin, " + G.home + " minus " + G.away;
+    $("lineLbl").textContent = G.home + " line";
+    $("line").value = m.spread_home == null ? 0 : -m.spread_home;
+    $("tot").value = m.total == null ? 44.5 : m.total;
+    $("distLede").textContent = "Final scores of all " + G.sims.toLocaleString() + " simulations. Dark bars are the side that wins at the line you set; it starts at the market's closing number.";
+    function upd() {
+      var L = +$("line").value, T = +$("tot").value;
+      hist($("mHist"), margin, -35, 35, -L, function (v) { return v + L > 0; });
+      hist($("tHist"), total, 10, 80, T, function (v) { return v > T; });
+      var cov = margin.filter(function (v) { return v + L > 0; }).length / margin.length;
+      var push = margin.filter(function (v) { return v + L === 0; }).length / margin.length;
+      var ov = total.filter(function (v) { return v > T; }).length / total.length;
+      $("pCover").textContent = G.home + " covers " + pct(cov) + (push ? " · push " + pct(push) : "");
+      $("pOver").textContent = "Over " + pct(ov);
+    }
+    $("line").oninput = upd; $("tot").oninput = upd;
+    upd();
+  }
+
+  // ---- players
+  function cell(v) {
+    if (!v) return '<td class="n">—</td>';
+    return '<td class="n">' + Math.round(v[1]) + '<span class="rng">' + Math.round(v[0]) + "–" + Math.round(v[2]) + '</span></td>';
+  }
+  function renderPlayers() {
+    var rows = G.players.map(function (p) {
+      return '<tr><td>' + esc(p.name) + '<span class="tm">' + esc(p.team) + (p.pos ? " " + esc(p.pos) : "") + '</span></td>' +
+        cell(p.pass_yds) + cell(p.rush_yds) + cell(p.rec_yds) + cell(p.rec) +
+        '<td class="n">' + pct(p.any_td) + '</td></tr>';
+    }).join("");
+    $("players").innerHTML = '<thead><tr><th>Player</th><th>Pass yds</th><th>Rush yds</th><th>Rec yds</th><th>Catches</th><th>Any TD</th></tr></thead><tbody>' + rows + '</tbody>';
+  }
+
+  // ---- backtest
+  (function () {
+    var b = S.backtest;
+    if (!b) { $("bt").textContent = "No backtest bundled."; return; }
+    var r = [["", "Sim", "Market"],
+      ["Win probability, Brier", fmt(b.brier_sim, 3), fmt(b.brier_market, 3)],
+      ["Margin, mean miss", fmt(b.margin_mae_sim), fmt(b.margin_mae_market)],
+      ["Total, mean miss", fmt(b.total_mae_sim), fmt(b.total_mae_market)],
+      ["Total, average bias", fmt(b.total_bias_sim), fmt(b.total_bias_market)]];
+    $("bt").innerHTML = r.map(function (row, i) {
+      return row.map(function (c, j) { return '<span class="' + (i === 0 ? "h" : j === 0 ? "k" : "") + '">' + esc(c) + '</span>'; }).join("");
+    }).join("");
+    var a = b.ats_w_l_p, o = b.ou_w_l_p;
+    $("btNote").innerHTML = "<strong>" + b.games + " finished games, weeks 3 to 7</strong>, each simulated using only data from before that week. " +
+      "Lower is better on every row. Against the closing spread the sim's side went " + a[0] + "–" + a[1] + "–" + a[2] +
+      ", and on totals " + o[0] + "–" + o[1] + ". That many games cannot separate skill from luck, and the sim runs about " +
+      Math.abs(b.total_bias_sim).toFixed(1) + " points light on totals, so its unders are not a signal.";
+  })();
+
+  var start0 = 0;
+  S.games.forEach(function (g, i) { if (g.game_id === hashGame) start0 = i; });
+  pick(start0);
+})();
+</script>

@@ -1,0 +1,22 @@
+{
+ "games": 62,
+ "brier_sim": 0.23171270161290328,
+ "brier_market": 0.23474275814362505,
+ "margin_mae_sim": 7.74475806451613,
+ "margin_mae_market": 8.040322580645162,
+ "total_mae_sim": 10.847499999999998,
+ "total_mae_market": 10.17741935483871,
+ "total_bias_sim": -3.0412903225806454,
+ "total_bias_market": -1.8387096774193548,
+ "sim_vs_market_margin_corr": 0.7954750133143264,
+ "ats_w_l_p": [
+  35,
+  22,
+  5
+ ],
+ "ou_w_l_p": [
+  27,
+  35,
+  0
+ ]
+}
