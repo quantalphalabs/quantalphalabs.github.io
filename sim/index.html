@@ -37,6 +37,7 @@ a { color:var(--ink); }
 
 .masthead .wrap { display:flex; align-items:center; gap:10px; padding-block:20px 0; flex-wrap:wrap; }
 .wordmark { font-weight:600; font-size:14px; }
+.wordmark-link { display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink); }
 .alpha { font-size:17px; }
 .masthead .meta { margin-left:auto; font-family:var(--mono); font-size:10.5px; color:var(--ink-4); }
 
@@ -63,6 +64,9 @@ section > h3 { font-size:15px; margin-bottom:4px; }
 .final .pts { font-size:44px; line-height:1; font-weight:500; }
 .final .dash { color:rgba(255,255,255,.3); font-size:28px; }
 .hero p { margin:14px 0 0; color:rgba(255,255,255,.66); font-size:13px; max-width:40rem; }
+.hero p.check { color:#fff; font-size:13.5px; border-left:2px solid rgba(255,255,255,.4); padding-left:12px; }
+.tab .f { opacity:.55; margin-left:4px; }
+td.hit { font-weight:600; }
 .stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(9.5rem, 1fr)); gap:18px 26px;
   margin-top:24px; padding-top:20px; border-top:1px solid rgba(255,255,255,.14); }
 .stats .v { font-family:var(--mono); font-size:21px; margin-top:4px; font-variant-numeric:tabular-nums; }
@@ -149,7 +153,7 @@ footer a { color:var(--ink-3); }
 </style>
 
 <header class="masthead"><div class="wrap">
-  <span class="alpha">&#945;</span><span class="wordmark">Quant Alpha Lab</span>
+  <a class="wordmark-link" href="../"><span class="alpha">&#945;</span><span class="wordmark">Quant Alpha Lab</span></a>
   <span class="lbl" style="margin-left:6px">Snap sim</span>
   <span class="meta" id="meta"></span>
 </div></header>
@@ -160,6 +164,7 @@ footer a { color:var(--ink-3); }
   <section class="hero" aria-live="polite">
     <div class="lbl" id="heroLbl">Most typical simulated game</div>
     <div class="final" id="final"></div>
+    <p class="check" id="check" hidden></p>
     <p id="heroP">Every snap is resampled from real 2026 plays: the ball carrier's own
     snaps, re-weighted by how this quarterback, this offensive line and this defense
     shift the outcome. The game shown is the one simulation closest to the median of
@@ -167,7 +172,7 @@ footer a { color:var(--ink-3); }
     <div class="stats" id="stats"></div>
   </section>
 
-  <section aria-label="Replay">
+  <section aria-label="Replay" id="secReplay">
     <h3>Replay of the typical game</h3>
     <p class="lede">Play through it snap by snap, or pick a drive below to jump to it.</p>
     <div class="board" id="board"></div>
@@ -183,14 +188,14 @@ footer a { color:var(--ink-3); }
     </div>
   </section>
 
-  <section aria-label="Drives">
+  <section aria-label="Drives" id="secDrives">
     <h3>Drive chart</h3>
     <p class="lede" id="driveLede"></p>
     <div class="drives" id="drives"></div>
     <div class="key" id="key"></div>
   </section>
 
-  <section aria-label="Distribution">
+  <section aria-label="Distribution" id="secDist">
     <h3>All simulations</h3>
     <p class="lede" id="distLede"></p>
     <div class="dists">
@@ -201,10 +206,19 @@ footer a { color:var(--ink-3); }
     </div>
   </section>
 
-  <section aria-label="Players">
+  <section aria-label="Players" id="secPlayers">
     <h3>Player outcomes</h3>
     <p class="lede">Median across all simulations, with the 10th to 90th percentile beside it.</p>
     <div class="tbl-wrap"><table id="players"></table></div>
+  </section>
+
+  <section aria-label="Record">
+    <h3>Season record</h3>
+    <p class="lede">Every game is scored against its last simulation from before kickoff.
+    Those runs are committed to the site's public history with a timestamp, so this is a
+    record kept in advance, not the model graded in hindsight.</p>
+    <div class="bt" id="recSum"></div>
+    <div class="tbl-wrap" id="recWrap" style="margin-top:14px"><table id="record"></table></div>
   </section>
 
   <section aria-label="Method">
@@ -232,7 +246,7 @@ footer a { color:var(--ink-3); }
   <span>Not affiliated with RotoBot &middot; 21+ &middot; not betting advice</span>
 </div></footer>
 
-<script src="out/sim-data.js"></script>
+<script src="data/sim-data.js"></script>
 <script>
 (function () {
   var S = window.SIM;
@@ -247,14 +261,22 @@ footer a { color:var(--ink-3); }
     $("final").textContent = "No simulation data found. Run sim.py for a week first.";
     return;
   }
-  $("meta").textContent = "Week " + S.week + " · " + S.games.length + " games · " +
-    S.sims.toLocaleString() + " sims each · data through week " + S.data_through_week;
+  var etFmt = function (iso, withDay) {
+    if (!iso) return "\u2014";
+    try {
+      return new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", weekday: withDay === false ? undefined : "short",
+        hour: "numeric", minute: "2-digit" }).format(new Date(iso)) + " ET";
+    } catch (e) { return iso; }
+  };
+  $("meta").textContent = "Week " + S.week + " \u00b7 " + S.games.length + " games \u00b7 " +
+    S.sims.toLocaleString() + " sims each \u00b7 updated " + etFmt(S.updated_at);
 
   // ---- game picker
   var hashGame = (location.hash || "").slice(1);
   S.games.forEach(function (g, i) {
     var b = document.createElement("button");
-    b.className = "tab"; b.type = "button"; b.textContent = g.away + " @ " + g.home;
+    b.className = "tab"; b.type = "button";
+    b.innerHTML = esc(g.away + " @ " + g.home) + (g.final ? '<span class="f">F</span>' : g.pending ? '<span class="f">\u00b7</span>' : "");
     b.dataset.i = i; b.id = "g-" + g.game_id;
     b.addEventListener("click", function () { pick(i); });
     $("games").appendChild(b);
@@ -267,8 +289,23 @@ footer a { color:var(--ink-3); }
     });
     try { history.replaceState(null, "", "#" + G.game_id); } catch (e) {}
     stop();
+    var ready = !G.pending;
+    ["secReplay", "secDrives", "secDist", "secPlayers"].forEach(function (id) { $(id).hidden = !ready; });
+    if (!ready) { renderPending(); return; }
     renderHero(); buildPlays(); renderDrives(); renderDists(); renderPlayers();
     go(0);
+  }
+
+  function renderPending() {
+    $("heroLbl").textContent = "Kickoff " + etFmt(G.kickoff_at);
+    $("final").innerHTML = '<span class="team">' + esc(G.away) + '</span><span class="dash">@</span><span class="team">' + esc(G.home) + '</span>';
+    $("check").hidden = true;
+    $("heroP").textContent = G.final
+      ? "Final: " + G.away + " " + G.final.away + ", " + G.home + " " + G.final.home +
+        ". This game was played before it was ever simulated, so it has no simulation and no grade."
+      : "Not simulated yet. The night-before run is scheduled for " + etFmt(G.next_run_at) +
+        ", with a second run " + S.pregame_hours + " hours before kickoff to pick up late injury news.";
+    $("stats").innerHTML = "";
   }
 
   // ---- hero
@@ -281,8 +318,9 @@ footer a { color:var(--ink-3); }
 
   function renderHero() {
     var t = G.typical.score, m = G.market || {};
-    $("heroLbl").textContent = "Most typical of " + G.sims.toLocaleString() + " simulated games" +
-      (G.kickoff ? " · " + G.kickoff + " ET" : "");
+    var stageName = G.stage === "pregame" ? "pregame check" : "night-before run";
+    $("heroLbl").textContent = "Most typical of " + G.sims.toLocaleString() + " simulated games \u00b7 kickoff " +
+      etFmt(G.kickoff_at) + " \u00b7 " + stageName + " " + etFmt(G.run_at);
     $("final").innerHTML =
       '<span class="team">' + esc(G.away) + '</span><span class="pts">' + t.away + '</span>' +
       '<span class="dash">–</span><span class="pts">' + t.home + '</span><span class="team">' + esc(G.home) + '</span>';
@@ -303,7 +341,36 @@ footer a { color:var(--ink-3); }
     if (qb.away || qb.home) bits.push("Starting QBs: " + (qb.away || "?") + " (" + G.away + "), " + (qb.home || "?") + " (" + G.home + ").");
     var mm = [].concat((miss.away || []).map(function (n) { return n + " (" + G.away + ")"; }), (miss.home || []).map(function (n) { return n + " (" + G.home + ")"; }));
     if (mm.length) bits.push("Ruled out from the injury report or roster: " + mm.join(", ") + ".");
-    $("heroP").textContent = "Every snap is resampled from real 2026 plays: the ball carrier's own snaps, re-weighted by how this quarterback, this offensive line and this defense shift the outcome. The game shown is the one simulation closest to the median of all of them on score, yards and turnovers. " + bits.join(" ");
+    if (G.injuries) bits.push("Injury source: " + G.injuries + ".");
+    renderCheck();
+    $("heroP").textContent = "Every snap is resampled from real " + S.season + " plays: the ball carrier's own snaps, re-weighted by how this quarterback, this offensive line and this defense shift the outcome. The game shown is the one simulation closest to the median of all of them on score, yards and turnovers. " + bits.join(" ");
+  }
+
+  function renderCheck() {
+    var el = $("check"), c = G.check, parts = [];
+    if (G.final) {
+      parts.push("Final: " + G.away + " " + G.final.away + ", " + G.home + " " + G.final.home + ".");
+    }
+    if (c) {
+      var names = function (side) {
+        var t = side === "home" ? G.home : G.away;
+        return (c.newly_out[side] || []).map(function (n) { return n + " (" + t + ")"; });
+      };
+      var out = names("away").concat(names("home"));
+      var moved = Math.abs(c.home_win[1] - c.home_win[0]) >= 0.005 || Math.abs(c.total[1] - c.total[0]) >= 0.05;
+      parts.push("Pregame check, " + etFmt(G.run_at) + ": " +
+        (out.length ? "newly ruled out " + out.join(", ") + ". " : "no new players ruled out. ") +
+        (c.qb_changed ? "Starting QB changed. " : "") +
+        (moved ? G.home + " win " + pct(c.home_win[0]) + " \u2192 " + pct(c.home_win[1]) +
+                 ", total " + fmt(c.total[0]) + " \u2192 " + fmt(c.total[1]) + "."
+               : "The numbers match the night-before run."));
+    } else if (G.stage === "night" && !G.final) {
+      var ko = new Date(G.kickoff_at).getTime();
+      parts.push("A pregame check reruns this " + S.pregame_hours + " hours before kickoff, around " +
+        etFmt(new Date(ko - S.pregame_hours * 3600e3).toISOString(), false) + ".");
+    }
+    el.textContent = parts.join(" ");
+    el.hidden = !parts.length;
   }
 
   // ---- field geometry: home defends the left goal line, x in yards 0..100
@@ -521,7 +588,41 @@ footer a { color:var(--ink-3); }
       Math.abs(b.total_bias_sim).toFixed(1) + " points light on totals, so its unders are not a signal.";
   })();
 
+  (function () {
+    var rows = S.record || [], sum = S.record_summary;
+    if (!rows.length || !sum) {
+      $("recSum").textContent = "";
+      $("recWrap").innerHTML = '<p class="lede" style="margin:12px">No games graded yet. Each game appears here once its final score is in.</p>';
+      return;
+    }
+    var a = sum.ats_w_l_p, o = sum.ou_w_l_p;
+    var r = [["", "Sim", "Market"],
+      ["Win probability, Brier", fmt(sum.brier_sim, 3), fmt(sum.brier_market, 3)],
+      ["Margin, mean miss", fmt(sum.margin_mae_sim), fmt(sum.margin_mae_market)],
+      ["Winners called", sum.winners + " of " + sum.games, ""],
+      ["Against the spread", a[0] + "\u2013" + a[1] + "\u2013" + a[2], ""],
+      ["Totals, over/under", o[0] + "\u2013" + o[1] + "\u2013" + o[2], ""]];
+    $("recSum").innerHTML = r.map(function (row, i) {
+      return row.map(function (c, j) { return '<span class="' + (i === 0 ? "h" : j === 0 ? "k" : "") + '">' + esc(c) + '</span>'; }).join("");
+    }).join("");
+    var body = rows.slice().reverse().map(function (x) {
+      var simSide = x.sim_margin > x.mkt_margin ? x.home : x.away;
+      var res = x.margin - x.mkt_margin;
+      var hit = res === 0 ? null : (res > 0 ? x.home : x.away) === simSide;
+      return '<tr><td>' + esc(x.away + " @ " + x.home) + '<span class="tm">wk ' + x.week + '</span></td>' +
+        '<td class="n">' + pct(x.sim_home_win) + '</td><td class="n">' + pct(x.mkt_home_win) + '</td>' +
+        '<td class="n">' + (x.sim_margin > 0 ? "+" : "") + fmt(x.sim_margin) + '</td>' +
+        '<td class="n">' + (x.mkt_margin > 0 ? "+" : "") + fmt(x.mkt_margin) + '</td>' +
+        '<td class="n">' + x.away_score + "\u2013" + x.home_score + '</td>' +
+        '<td class="n' + (hit ? " hit" : "") + '">' + esc(simSide) + " " + (hit == null ? "push" : hit ? "won" : "lost") + '</td></tr>';
+    }).join("");
+    $("record").innerHTML = '<thead><tr><th>Game</th><th>Sim home win</th><th>Market</th><th>Sim margin</th><th>Market margin</th><th>Final</th><th>Sim side vs spread</th></tr></thead><tbody>' + body + '</tbody>';
+  })();
+
   var start0 = 0;
+  var firstOpen = -1;
+  S.games.forEach(function (g, i) { if (firstOpen < 0 && !g.final && !g.pending) firstOpen = i; });
+  if (firstOpen >= 0) start0 = firstOpen;
   S.games.forEach(function (g, i) { if (g.game_id === hashGame) start0 = i; });
   pick(start0);
 })();

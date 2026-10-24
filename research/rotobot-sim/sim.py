@@ -460,6 +460,8 @@ class Offense:
         if use_roster:
             r = D["roster"]
             out |= set(r[(r["team"] == team) & (r["status"] != "ACT")].index)
+        # Late news the weekly files don't have yet (see autorun.py).
+        out |= D.get("live_out", {}).get(team, set())
         # Players who have since moved to another team.
         latest_team = h[h["season"] == SEASON].groupby("receiver_player_id")["posteam"].last().to_dict()
         latest_team.update(h[h["season"] == SEASON].groupby("rusher_player_id")["posteam"].last().to_dict())

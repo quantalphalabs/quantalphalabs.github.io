@@ -96,18 +96,42 @@ games cannot separate skill from luck. The sim still runs about 3 points light o
 the same bias RotoBot admits to, so its unders are not a signal. It has no home-field
 term, no weather, no explicit timeouts and no coverage data.
 
-## Run it
+## On the website, automatically
+
+The page lives at [`/sim/`](../../sim/) on the site and is linked from the main
+navigation. `.github/workflows/snap-sim.yml` runs `autorun.py` every 15 minutes. Most
+runs find nothing due and stop. Otherwise:
+
+| When | What runs |
+| --- | --- |
+| 8pm ET the night before each game day | Every game that day, 2,000 sims each, with data through the previous week. |
+| 2 hours before each kickoff | That kickoff's games again, with the latest injury news. The page shows what changed since the night run: players newly ruled out, a starting-QB change, and how far the win probability and total moved. |
+| Once a final score is in | The last run from before kickoff is graded into `sim/data/record.json` and the season record on the page. |
+
+Each simulation keeps its seed between runs, so a pregame run on unchanged information
+reproduces the night run exactly. Any difference comes from new information.
+
+Injuries come from nflverse's weekly report and roster status, plus ESPN's live injury
+feed when it answers. Each game's page says which sources it used. Official inactives
+are posted 90 minutes before kickoff, after the 2-hour check, so a late scratch announced
+only with the inactives is not reflected. Change `PREGAME_HOURS` in `autorun.py` to move
+the check (for example 1.25 to run after inactives).
+
+To run a stage by hand: Actions → Snap sim → Run workflow, choose `night` or `pregame`.
+
+## Run it locally
 
 ```sh
-./fetch_data.sh /path/to/data                 # public nflverse files, about 35 MB
-pip install pandas numpy pyarrow
-python sim.py --data /path/to/data --week 7 --sims 2000 --out out
-python sim.py --data /path/to/data --backtest 3-7 --sims 400 --out bt
+pip install -r requirements.txt
+python autorun.py --data /tmp/nflverse --site ../../sim               # whatever is due now
+python autorun.py --data /tmp/nflverse --site ../../sim --force night  # this week's open games now
+python sim.py --data /tmp/nflverse --backtest 3-7 --sims 400 --out bt  # backtest
+./fetch_data.sh /tmp/nflverse                                          # data for sim.py on its own
 ```
 
-`out/` gets one JSON file per game: win probability, score distribution, player
-percentiles and the typical game's play-by-play. It also gets `sim-data.js`, which
-`index.html` replays. A full week of 13 games × 2,000 sims takes about a minute.
+`autorun.py --now 2026-10-25T11:00-04:00` pretends it is a given time, which is how the
+schedule is tested. Don't use it for runs that will be published: grading trusts the run
+timestamp.
 
 NFL data via [nflverse](https://nflverse.com), CC-BY 4.0. Not affiliated with RotoBot.
 Not betting advice.
