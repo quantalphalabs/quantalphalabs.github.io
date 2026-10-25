@@ -1,0 +1,21 @@
+[
+ {
+  "game_id": "2026_07_PIT_NO",
+  "week": 7,
+  "home": "NO",
+  "away": "PIT",
+  "kickoff_at": "2026-10-25T09:30:00-04:00",
+  "stage": "pregame",
+  "run_at": "2026-10-25T12:29:10+00:00",
+  "sim_home_win": 0.40075,
+  "sim_margin": -2.791,
+  "sim_total": 40.883,
+  "mkt_home_win": 0.4170073589533933,
+  "mkt_margin": -3.0,
+  "mkt_total": 43.5,
+  "margin": -6.0,
+  "total": 26.0,
+  "home_score": 10,
+  "away_score": 16
+ }
+]
