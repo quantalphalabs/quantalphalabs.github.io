@@ -207,5 +207,24 @@
   "total": 56.0,
   "home_score": 21,
   "away_score": 35
+ },
+ {
+  "game_id": "2026_07_KC_SEA",
+  "week": 7,
+  "home": "SEA",
+  "away": "KC",
+  "kickoff_at": "2026-10-25T20:20:00-04:00",
+  "stage": "night",
+  "run_at": "2026-10-25T01:41:40+00:00",
+  "sim_home_win": 0.4565,
+  "sim_margin": -1.0375,
+  "sim_total": 42.9845,
+  "mkt_home_win": 0.5720596355604638,
+  "mkt_margin": 3.0,
+  "mkt_total": 42.5,
+  "margin": 17.0,
+  "total": 23.0,
+  "home_score": 20,
+  "away_score": 3
  }
 ]
