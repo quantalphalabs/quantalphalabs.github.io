@@ -226,5 +226,24 @@
   "total": 23.0,
   "home_score": 20,
   "away_score": 3
+ },
+ {
+  "game_id": "2026_07_DAL_PHI",
+  "week": 7,
+  "home": "PHI",
+  "away": "DAL",
+  "kickoff_at": "2026-10-26T20:15:00-04:00",
+  "stage": "night",
+  "run_at": "2026-10-26T00:24:55+00:00",
+  "sim_home_win": 0.42474999999999996,
+  "sim_margin": -2.3735,
+  "sim_total": 43.3465,
+  "mkt_home_win": 0.33635187580853815,
+  "mkt_margin": -4.5,
+  "mkt_total": 43.5,
+  "margin": -17.0,
+  "total": 59.0,
+  "home_score": 21,
+  "away_score": 38
  }
 ]
