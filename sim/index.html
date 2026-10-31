@@ -137,6 +137,8 @@ tbody tr:last-child td { border-bottom:0; }
   font-family:var(--mono); font-size:12px; font-variant-numeric:tabular-nums; }
 .bt .h { font-size:9.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-4); }
 .bt .k { font-family:var(--font); color:var(--ink-3); }
+#val { overflow-x:auto; gap:6px 12px; font-size:11.5px; }
+#val span { white-space:nowrap; }
 .caveat { border-left:2px solid var(--ink-4); padding:2px 0 2px 14px; margin:14px 0 0;
   font-size:12.5px; color:var(--ink-3); max-width:44rem; }
 .caveat strong { color:var(--ink); font-weight:600; }
@@ -236,6 +238,8 @@ footer a { color:var(--ink-3); }
       <div>
         <div class="bt" id="bt"></div>
         <p class="caveat" id="btNote"></p>
+        <div class="bt" id="val" style="margin-top:18px"></div>
+        <p class="caveat" id="valNote"></p>
       </div>
     </div>
   </section>
@@ -602,6 +606,7 @@ footer a { color:var(--ink-3); }
       ["Margin, mean miss", fmt(sum.margin_mae_sim), fmt(sum.margin_mae_market)],
       ["Winners called", sum.winners + " of " + sum.games, ""],
       ["Against the spread", a[0] + "\u2013" + a[1] + "\u2013" + a[2], ""],
+      ["Spread picks on the underdog", sum.dog_share == null ? "\u2014" : pct(sum.dog_share), ""],
       ["Totals, over/under", o[0] + "\u2013" + o[1] + "\u2013" + o[2], ""]];
     $("recSum").innerHTML = r.map(function (row, i) {
       return row.map(function (c, j) { return '<span class="' + (i === 0 ? "h" : j === 0 ? "k" : "") + '">' + esc(c) + '</span>'; }).join("");
@@ -618,6 +623,30 @@ footer a { color:var(--ink-3); }
         '<td class="n' + (hit ? " hit" : "") + '">' + esc(simSide) + " " + (hit == null ? "push" : hit ? "won" : "lost") + '</td></tr>';
     }).join("");
     $("record").innerHTML = '<thead><tr><th>Game</th><th>Sim home win</th><th>Market</th><th>Sim margin</th><th>Market margin</th><th>Final</th><th>Sim side vs spread</th></tr></thead><tbody>' + body + '</tbody>';
+  })();
+
+  // ---- two-season test: does the sim know anything the closing line does not?
+  (function () {
+    var v = S.validation;
+    if (!v) return;
+    var rows = [["Season", "Brier (mkt)", "Miss (mkt)", "ATS (dogs)"]];
+    Object.keys(v.seasons).forEach(function (k) {
+      var e = v.seasons[k];
+      rows.push([k + " \u00b7 " + e.games, fmt(e.brier, 3) + " (" + fmt(e.brier_market, 3) + ")",
+                 fmt(e.margin_mae) + " (" + fmt(e.margin_mae_market) + ")",
+                 e.ats[0] + "\u2013" + e.ats[1] + " (" + pct(e.dog_share) + ")"]);
+    });
+    $("val").style.gridTemplateColumns = "auto auto auto auto";
+    $("val").innerHTML = rows.map(function (row, i) {
+      return row.map(function (c, j) { return '<span class="' + (i === 0 ? "h" : j === 0 ? "k" : "") + '">' + esc(c) + '</span>'; }).join("");
+    }).join("");
+    var b = v.seasons;
+    var parts = Object.keys(b).map(function (k) {
+      var x = b[k].beyond_line;
+      return k + " " + (x.slope >= 0 ? "+" : "") + x.slope.toFixed(2) + " (t " + x.t.toFixed(1) + ")";
+    });
+    $("valNote").innerHTML = "<strong>Does it beat the closing line? Not yet.</strong> " + esc(v.conclusion) +
+      " Share of the sim's disagreement with the line that showed up in results: " + esc(parts.join(", ")) + ".";
   })();
 
   var start0 = 0;

@@ -1,0 +1,8 @@
+{
+ "cfg": {
+  "cal_c": 1.68
+ },
+ "fitted_on": "2025 regular season, weeks 3-18, 240 games",
+ "why": "The sim scored 1.7 points a game below actual totals in 2025 and 2.0 in 2026. Fitted on 2025, the correction cut the 2026 bias to -0.3 and the 2026 totals miss from 10.56 to 10.39.",
+ "not_adopted": "Settings tuned on 2025 (wider team effects, less prior-season weight, slower recency decay, less defensive shrinkage), a margin calibration, a home-field weight and the FTN matchup interactions all failed to improve 2026. See validation.json."
+}

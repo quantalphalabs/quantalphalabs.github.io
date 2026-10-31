@@ -96,6 +96,35 @@ games cannot separate skill from luck. The sim still runs about 3 points light o
 the same bias RotoBot admits to, so its unders are not a signal. It has no home-field
 term, no weather, no explicit timeouts and no coverage data.
 
+## What tuning found (October 31, 2026)
+
+`tune.py` fits the sim's hand-set numbers on the 2025 season (240 games, weeks 3-18)
+and scores the result once on 2026 (76 games, weeks 3-8). Each game is simulated
+with only the data from before its week. Details: `validation.json`,
+`tuning_results.json`.
+
+| Season | Brier, sim (market) | Margin miss, sim (market) | ATS | Spread picks on the underdog |
+| --- | --- | --- | --- | --- |
+| 2025 | 0.235 (0.215) | 10.9 (10.1) | 119-120 | 85% |
+| 2026 | 0.227 (0.234) | 8.1 (8.4) | 45-26 | 82% |
+
+- **The sim does not beat the closing line.** When it disagreed with the market, the
+  result moved against it in 2025 (-0.38 points per point of disagreement, t = -1.9)
+  and with it in 2026 (+0.56, t = +1.4). Neither is significant and they point opposite
+  ways. A blend fitted on 2025 puts no weight on the sim.
+- **Its ATS record mostly measures underdogs.** Its margins are flatter than the
+  market's, so its side is the underdog about 83% of the time. Underdogs covered in
+  2026 and split in 2025, and so did the sim.
+- **Tuning did not transfer.** Wider team effects, less prior-season weight, slower
+  recency decay and less defensive shrinkage improved 2025 Brier from 0.235 to 0.224
+  and made 2026 worse (0.227 to 0.236). A margin calibration, a home-field weight and
+  the FTN play-action / stacked-box matchups also failed on 2026. None was adopted.
+- **Kept:** timeouts and the two-minute warning, and a +1.68-point totals correction
+  fitted on 2025 (`calibration.json`). On 2026 it cut the scoring bias from -2.0 to
+  -0.3 and the totals miss from 10.56 to 10.39.
+
+A larger test needs earlier seasons: `tune.py --train 2024` with the 2023 files.
+
 ## On the website, automatically
 
 The page lives at [`/sim/`](../../sim/) on the site and is linked from the main

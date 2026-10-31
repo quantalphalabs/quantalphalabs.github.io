@@ -240,8 +240,11 @@ def record_summary(record):
     win = [1.0 if r["margin"] > 0 else 0.5 if r["margin"] == 0 else 0.0 for r in rows]
     ats = [0, 0, 0]
     ou = [0, 0, 0]
+    dogs = 0
     for r in rows:
         side = (r["sim_margin"] > r["mkt_margin"]) - (r["sim_margin"] < r["mkt_margin"])
+        fav = (r["mkt_margin"] > 0) - (r["mkt_margin"] < 0)
+        dogs += side != 0 and fav != 0 and side != fav
         res = (r["margin"] > r["mkt_margin"]) - (r["margin"] < r["mkt_margin"])
         ats[2 if res == 0 else 0 if side == res else 1] += 1
         side = (r["sim_total"] > r["mkt_total"]) - (r["sim_total"] < r["mkt_total"])
@@ -257,6 +260,9 @@ def record_summary(record):
         "margin_mae_sim": sum(abs(r["sim_margin"] - r["margin"]) for r in rows) / n,
         "margin_mae_market": sum(abs(r["mkt_margin"] - r["margin"]) for r in rows) / n,
         "ats_w_l_p": ats, "ou_w_l_p": ou,
+        # The sim's spread side is the market underdog this often. A high share means
+        # the ATS record mostly measures how underdogs did, not the sim's skill.
+        "dog_share": dogs / n,
     }
 
 
@@ -312,6 +318,8 @@ def bundle(g, site, games_dir, record, now, sims):
             "updated_at": now.astimezone(dt.timezone.utc).isoformat(timespec="seconds"),
             "night_hour_et": NIGHT_BEFORE_HOUR, "pregame_hours": PREGAME_HOURS,
             "backtest": json.loads(bt.read_text()) if bt.exists() else None,
+            "validation": (json.loads(Path(__file__).with_name("validation.json").read_text())
+                           if Path(__file__).with_name("validation.json").exists() else None),
             "record": record, "record_summary": record_summary(record), "games": games}
     (site / "data").mkdir(parents=True, exist_ok=True)
     (site / "data" / "sim-data.js").write_text(
