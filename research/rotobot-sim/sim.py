@@ -36,9 +36,26 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-PRIOR_SEASON_WEIGHT = 0.35   # a 2025 play counts this much against a current one
-HALF_LIFE_WEEKS = 4.0        # recency decay inside the current season
-SHARE_HALF_LIFE_GAMES = 2.0  # target and carry shares move faster than efficiency
+# Every hand-set number in one place, so tune.py can fit them on one season and
+# test them on the next. `calibration.json` beside this file, written by tune.py,
+# overrides these defaults when it exists.
+CFG = {
+    "prior_w": 0.35,        # a prior-season play counts this much against a current one
+    "half_life": 4.0,       # recency decay inside the current season, in weeks
+    "share_half_life": 2.0, # target and carry shares move faster than efficiency
+    "k_qb_cls": 150, "k_def_cls": 250, "k_qb_blitz": 60,   # dropback-class shrinkage
+    "k_qb_pass": 80, "k_def_pass": 120,                    # pass-outcome ratio shrinkage
+    "k_ol": 150, "k_def_run": 150,                         # run-outcome ratio shrinkage
+    "own_w": 0.6, "k_own_rec": 20, "k_own_rush": 25,       # trust in a player's own plays
+    "effect_pow": 1.0,      # >1 widens team effects; the sim's margins ran narrow
+    "hfa": 0.0,             # weight on the league's home/away outcome split
+    "timeouts": True,       # timeouts and the two-minute warning
+    "scheme": 0.0,          # weight on play-action and stacked-box matchups (FTN)
+    "cal_a": 0.0, "cal_b": 1.0, "cal_c": 0.0,   # margin a + b*raw, total raw + c
+}
+_cal = Path(__file__).with_name("calibration.json")
+if _cal.exists():
+    CFG.update(json.loads(_cal.read_text()).get("cfg", {}))
 SEASON = 2026
 
 PBP_COLS = [
@@ -50,7 +67,7 @@ PBP_COLS = [
     "rusher_player_name", "passer_player_id", "passer_player_name", "penalty", "penalty_yards",
     "penalty_team", "first_down_penalty", "field_goal_result", "kick_distance", "return_yards",
     "touchback", "extra_point_result", "two_point_conv_result", "qb_kneel", "qb_spike", "pass_oe",
-    "td_team", "first_down", "fixed_drive", "touchdown",
+    "td_team", "first_down", "fixed_drive", "touchdown", "timeout",
 ]
 
 
@@ -67,12 +84,16 @@ def load(data_dir):
     pbp = pbp.sort_values(["game_id", "play_id"], kind="stable").reset_index(drop=True)
 
     ftn = pd.concat([pd.read_parquet(d / f"ftn_charting_{s}.parquet",
-                                     columns=["nflverse_game_id", "nflverse_play_id", "n_blitzers"])
+                                     columns=["nflverse_game_id", "nflverse_play_id", "n_blitzers",
+                                              "is_play_action", "n_defense_box"])
                      for s in (SEASON - 1, SEASON)], ignore_index=True)
     ftn = ftn.rename(columns={"nflverse_game_id": "game_id", "nflverse_play_id": "play_id"})
     ftn["play_id"] = ftn["play_id"].astype(float)
     pbp = pbp.merge(ftn.drop_duplicates(["game_id", "play_id"]), on=["game_id", "play_id"], how="left")
     pbp["blitz"] = (pbp["n_blitzers"].fillna(0) > 0).astype(int)
+    pbp["pa"] = pbp["is_play_action"].fillna(False).astype(int)
+    box = pbp["n_defense_box"].fillna(0)
+    pbp["box"] = np.select([(box >= 1) & (box <= 6), box >= 8], [0, 2], 1)  # light/normal/stacked
 
     # Game clock that ran before the next snap, from the next row in the same quarter.
     g = pbp.groupby("game_id", sort=False)
@@ -80,6 +101,9 @@ def load(data_dir):
     nxt_qtr = g["qtr"].shift(-1)
     el = pbp["game_seconds_remaining"] - nxt_clock
     pbp["elapsed"] = el.where((nxt_qtr == pbp["qtr"]) & (el >= 0) & (el <= 50))
+    # A timeout right after a play is what stopped its clock; the sim calls its
+    # own timeouts, so those clock samples must not count twice.
+    pbp["before_timeout"] = (g["timeout"].shift(-1) == 1)
 
     # Field position the receiving team starts at after a kickoff.
     scrim = pbp["play_type"].isin(["pass", "run", "no_play", "punt", "field_goal", "qb_kneel"])
@@ -268,8 +292,8 @@ class League:
         pbp = D["pbp"]
         hist = pbp[(pbp["season"] < SEASON) | (pbp["week"] < week)].copy()
         cur = hist["season"] == SEASON
-        hist["w"] = np.where(cur, 0.5 ** ((week - 1 - hist["week"]) / HALF_LIFE_WEEKS),
-                             PRIOR_SEASON_WEIGHT)
+        hist["w"] = np.where(cur, 0.5 ** ((week - 1 - hist["week"]) / CFG["half_life"]),
+                             CFG["prior_w"])
         self.week = week
         self.hist = hist
         self.pos = D["pos"]
@@ -346,6 +370,18 @@ class League:
         self.tg_dist_b = {k: bin_dist(sub) for k, sub in tg.groupby("blitz")}
         self.rn_dist = {k: bin_dist(sub) for k, sub in rn.groupby("pg")}
         self.rn_dist_all = bin_dist(rn)
+        # How outcomes differ for a home offense and a road one, league-wide.
+        th, rh = tg["posteam"] == tg["home_team"], rn["posteam"] == rn["home_team"]
+        self.tg_home = {True: bin_dist(tg[th]) / bin_dist(tg), False: bin_dist(tg[~th]) / bin_dist(tg)}
+        self.rn_home = {True: bin_dist(rn[rh]) / self.rn_dist_all,
+                        False: bin_dist(rn[~rh]) / self.rn_dist_all}
+        # Play-action and box counts (FTN), used only as matchup interactions.
+        self.tg_dist_all = bin_dist(tg)
+        self.lg_pa = float((tg["pa"] * tg["w"]).sum() / tg["w"].sum())
+        self.tg_dist_pa = {f: bin_dist(tg[tg["pa"] == f]) for f in (0, 1)}
+        bw = rn.groupby("box")["w"].sum().reindex(range(3), fill_value=0)
+        self.lg_box = (bw / bw.sum()).to_numpy()
+        self.rn_dist_box = {b: bin_dist(rn[rn["box"] == b]) for b in range(3)}
 
         # Event tables: row -> (yards, complete, interception, fumble lost, air yards,
         # offensive TD, field zone it was run from). Plain tuples for a fast inner loop.
@@ -361,6 +397,8 @@ class League:
         # racing the clock snaps fast, a team protecting a lead uses all of it.
         # So the clock comes from (state, result) pools rather than the resampled play.
         ck = scrim.dropna(subset=["elapsed"])
+        if CFG["timeouts"]:
+            ck = ck[~ck["before_timeout"].fillna(False).astype(bool)]
         state = [clock_state(q, h, sd) for q, h, sd in zip(
             ck["qtr"], ck["half_seconds_remaining"], ck["score_differential"])]
         kind = np.select([ck["sack"] == 1, ck["complete_pass"] == 1, ck["play_type"] == "pass"],
@@ -448,7 +486,7 @@ class League:
 class Offense:
     """One team's personnel and pools against one specific defense."""
 
-    def __init__(self, L, D, team, opp, week, use_roster):
+    def __init__(self, L, D, team, opp, week, use_roster, is_home=True):
         self.team, self.opp = team, opp
         h = L.hist
         cur = h[(h["season"] == SEASON) & (h["posteam"] == team)]
@@ -472,7 +510,7 @@ class Offense:
             if not len(df):
                 return {}
             n = len(game_order)
-            gw = df["game_id"].map(lambda g: 0.5 ** ((n - 1 - game_order[g]) / SHARE_HALF_LIFE_GAMES))
+            gw = df["game_id"].map(lambda g: 0.5 ** ((n - 1 - game_order[g]) / CFG["share_half_life"]))
             s = gw.groupby(df[col]).sum()
             keep = [p not in out and latest_team.get(p, team) == team for p in s.index]
             self.missing |= {p for p, k in zip(s.index, keep) if not k and p in out}
@@ -519,15 +557,16 @@ class Offense:
             c = df.groupby("cls")["w"].sum().reindex(DROPBACK_CLASSES, fill_value=0)
             return (c + k * prior) / (c.sum() + k)
 
-        q_all = rates(qdb, L.lg_cls_all, 150)
-        d_all = rates(ddb, L.lg_cls_all, 250)
+        q_all = rates(qdb, L.lg_cls_all, CFG["k_qb_cls"])
+        d_all = rates(ddb, L.lg_cls_all, CFG["k_def_cls"])
+        pw = CFG["effect_pow"]
         self.cls = {}
         for b in (0, 1):
-            q = rates(qdb[qdb["blitz"] == b], q_all, 60)
+            q = rates(qdb[qdb["blitz"] == b], q_all, CFG["k_qb_blitz"])
             for z in range(len(ZONES) + 1):
                 for fs in range(FSITS):
                     lgc = L.lg_cls.get((b, z, fs), L.lg_cls_all)
-                    p = lgc * (q / L.lg_cls_all) * (d_all / L.lg_cls_all)
+                    p = lgc * (q / L.lg_cls_all) ** pw * (d_all / L.lg_cls_all) ** pw
                     p = (p / p.sum()).to_numpy()
                     self.cls[(b, z, fs)] = list(np.cumsum(p))
 
@@ -539,8 +578,33 @@ class Offense:
         # would halve every team effect; this multiplies them, as log5 does.
         tq = L.tg[L.tg["qb"] == qb]
         td = L.tg[L.tg["defteam"] == opp]
-        q_ratio = {bb: ratio(tq[tq["blitz"] == bb], L.tg_dist_b[bb], 80) for bb in (0, 1)}
-        d_ratio = {pg: ratio(td[td["pg"] == pg], L.tg_dist[pg], 120) for pg in L.tg_dist}
+        q_ratio = {bb: ratio(tq[tq["blitz"] == bb], L.tg_dist_b[bb], CFG["k_qb_pass"]) ** pw
+                   for bb in (0, 1)}
+        d_ratio = {pg: ratio(td[td["pg"] == pg], L.tg_dist[pg], CFG["k_def_pass"]) ** pw
+                   for pg in L.tg_dist}
+        home_t = L.tg_home[bool(is_home)] ** CFG["hfa"]
+        home_r = L.rn_home[bool(is_home)] ** CFG["hfa"]
+
+        # Matchup interactions, centred so they add nothing on average: how this
+        # defense does against play-action relative to its own norm (times how often
+        # this offense uses it), and how this offense runs into each box relative to
+        # its own norm (times how often this defense shows it). The main effects are
+        # already in the players' own plays; only the pairing is new information.
+        sc = CFG["scheme"]
+        self.scheme = sc > 0
+        to = L.tg[L.tg["posteam"] == team]
+        npa, n_to = (to["pa"] * to["w"]).sum(), to["w"].sum()
+        self.pa_rate = float((npa + 100 * L.lg_pa) / (n_to + 100))
+        d_all_pass = ratio(td, L.tg_dist_all, 120)
+        pa_x = {f: (ratio(td[td["pa"] == f], L.tg_dist_pa[f], 120) / d_all_pass) ** sc
+                for f in (0, 1)}
+        ro = L.rn[L.rn["posteam"] == team]
+        rd = L.rn[L.rn["defteam"] == opp]
+        rdw = rd.groupby("box")["w"].sum().reindex(range(3), fill_value=0).to_numpy()
+        self.box_cum = list(np.cumsum((rdw + 100 * L.lg_box) / (rdw.sum() + 100)))
+        o_all_run = ratio(ro, L.rn_dist_all, 150)
+        box_x = [(ratio(ro[ro["box"] == b], L.rn_dist_box[b], 150) / o_all_run) ** sc
+                 for b in range(3)]
         self.tmix = {}
         for pid in self.t_ids:
             pg = pos_group(L.pos.get(pid))
@@ -554,19 +618,18 @@ class Offense:
                                or L.tg_lg_sit[fs])
                         for b in (0, 1):
                             lgb = (L.tg_lg.get((pg, z, fs, b)) or lgp)
-                            m = Mix([(own, 0.6, 20)], lgb)
+                            m = Mix([(own, CFG["own_w"], CFG["k_own_rec"])], lgb)
                             # The receiver's own plays already carry his usual QB.
                             acc = (q_ratio[b] ** (1 - m.parts[0] if len(m.parts) > 1 else 1)
-                                   * d_ratio.get(pg, 1))
-                            self.tmix[(pid, z, fs, b)] = (m, list(acc / acc.max()))
-        ro = L.rn[L.rn["posteam"] == team]
-        rd = L.rn[L.rn["defteam"] == opp]
+                                   * d_ratio.get(pg, 1) * home_t)
+                            self.tmix[(pid, z, fs, b)] = (
+                                m, [list(a / a.max()) for a in (acc * pa_x[0], acc * pa_x[1])])
         self.rmix = {}
         for pid in self.r_ids:
             pg = pos_group(L.pos.get(pid))
             base = L.rn_dist.get(pg, L.rn_dist_all)
-            o_ratio = ratio(ro[ro["pg"] == pg], base, 150)
-            dr = ratio(rd[rd["pg"] == pg], base, 150)
+            o_ratio = ratio(ro[ro["pg"] == pg], base, CFG["k_ol"]) ** pw
+            dr = ratio(rd[rd["pg"] == pg], base, CFG["k_def_run"]) ** pw
             for st in range(SITS):
                 own = L.rn_rush.get((pid, st))
                 for z in range(len(ZONES) + 1):
@@ -574,10 +637,11 @@ class Offense:
                         if fsit_to_sit(fs) != st:
                             continue
                         lgp = L.rn_lg.get((pg, z, fs)) or L.rn_lg_any.get((z, fs)) or L.rn_lg_sit[fs]
-                        m = Mix([(own, 0.6, 25)], lgp)
-                        acc = o_ratio ** (1 - m.parts[0] if len(m.parts) > 1 else 1) * dr
-                        self.rmix[(pid, z, fs)] = (m, list(acc / acc.max()))
-        self.smix = Mix([(L.scr_qb.get(qb), 0.6, 15)], L.scr_lg)
+                        m = Mix([(own, CFG["own_w"], CFG["k_own_rush"])], lgp)
+                        acc = o_ratio ** (1 - m.parts[0] if len(m.parts) > 1 else 1) * dr * home_r
+                        self.rmix[(pid, z, fs)] = (
+                            m, [list(a / a.max()) for a in (acc * x for x in box_x)])
+        self.smix = Mix([(L.scr_qb.get(qb), CFG["own_w"], 15)], L.scr_lg)
 
     def pick(self, ids, cum, r):
         return ids[min(bisect.bisect_left(cum, r.random() * cum[-1]), len(ids) - 1)]
@@ -614,6 +678,7 @@ def sim_game(L, offs, seed, log=None):
     down, togo = 1, min(10.0, yl)
     drive_no = 0
     ot_poss = [0, 0]
+    tos = [3, 3]          # timeouts left, per half
 
     def note(kind, text, yards=0.0):
         if log is not None:
@@ -629,6 +694,7 @@ def sim_game(L, offs, seed, log=None):
                 continue
             if qtr == 2 or (qtr == 4 and score[0] == score[1]):
                 qtr, clock = (3, 900.0) if qtr == 2 else (5, 600.0)
+                tos = [3, 3] if qtr == 3 else [2, 2]
                 pos = 1 - first_recv if qtr == 3 else r.randrange(2)
                 yl = kickoff_yl()
                 down, togo, drive_no = 1, min(10.0, yl), drive_no + 1
@@ -642,7 +708,9 @@ def sim_game(L, offs, seed, log=None):
         late = qtr >= 4
         cstate = clock_state(qtr, clock if qtr in (2, 4, 5) else clock + 900, sd)
 
-        if (late and sd > 0 and down < 4 and clock <= 40 * (4 - down) + 2) or \
+        # Kneeling only runs the clock out when the defense cannot stop it.
+        d_to = tos[1 - pos] if CFG["timeouts"] else 0
+        if (late and sd > 0 and down < 4 and clock <= 40 * max(0, 4 - down - d_to) + 2) or \
            (qtr == 2 and clock <= 25 and yl >= 55):
             action = "kneel"
         elif down == 4:
@@ -732,7 +800,9 @@ def sim_game(L, offs, seed, log=None):
                     note("inc", f"{qb_name} throws it away")
                 else:
                     pid = off.pick(off.t_ids, off.t_cum, r)
-                    y, comp, it, f, air, td = L.T[draw(off.tmix[(pid, z, st, b)], L.T_bin, r)]
+                    m_, accs = off.tmix[(pid, z, st, b)]
+                    pa = (1 if r.random() < off.pa_rate else 0) if off.scheme else 0
+                    y, comp, it, f, air, td = L.T[draw((m_, accs[pa]), L.T_bin, r)]
                     rec = ps(pid)
                     rec[SI["tgt"]] += 1
                     if q:
@@ -764,7 +834,9 @@ def sim_game(L, offs, seed, log=None):
                         note("inc", f"{qb_name} incomplete to {nm}{tag}")
             elif off.r_ids:
                 pid = off.pick(off.r_ids, off.r_cum, r)
-                y, _, _, f, _, td = L.R[draw(off.rmix[(pid, z, st)], L.R_bin, r)]
+                m_, accs = off.rmix[(pid, z, st)]
+                bx = min(bisect.bisect_left(off.box_cum, r.random()), 2) if off.scheme else 1
+                y, _, _, f, _, td = L.R[draw((m_, accs[bx]), L.R_bin, r)]
                 gained, fumble, kind, ball = reach(y, td, yl, z), bool(f), "run", pid
                 a = ps(pid)
                 a[SI["rush_att"]] += 1
@@ -773,7 +845,22 @@ def sim_game(L, offs, seed, log=None):
                 note("run", f"{off.names.get(pid, '?')} run", gained)
 
             pool = L.clock.get((cstate, kind)) or L.clock[("normal", kind)]
-            clock -= pool[r.randrange(len(pool))]
+            el = pool[r.randrange(len(pool))]
+            if CFG["timeouts"] and kind != "inc":
+                # The clock is running after this play. A trailing offense late in a
+                # half stops it; so does a defense that needs the ball back.
+                half_end = qtr in (2, 4, 5)
+                if half_end and tos[pos] and clock <= (150 if qtr != 2 else 90) and \
+                        (sd <= 0 or qtr == 2) and yl - gained > 0:
+                    tos[pos] -= 1
+                    el = 6.0
+                elif late and tos[1 - pos] and clock <= 180 and 0 < sd <= 16:
+                    tos[1 - pos] -= 1
+                    el = 6.0
+            before = clock
+            clock -= el
+            if CFG["timeouts"] and qtr in (2, 4) and before > 120 > clock > 0:
+                clock = min(120.0, before - 5)   # two-minute warning stops it
 
             if new_pos is None:
                 if fumble and gained < yl:
@@ -892,8 +979,8 @@ def fourth_down(L, r, yl, togo, sd, qtr, clock):
 
 def run_game(L, D, game, n, seed=7, use_roster=False, keep_typical=True):
     home, away = game["home_team"], game["away_team"]
-    offs = (Offense(L, D, home, away, L.week, use_roster),
-            Offense(L, D, away, home, L.week, use_roster))
+    offs = (Offense(L, D, home, away, L.week, use_roster, is_home=True),
+            Offense(L, D, away, home, L.week, use_roster, is_home=False))
     players = sorted({p for o in offs for p in (o.t_ids + o.r_ids + ([o.qb] if o.qb else []))})
     pidx = {p: i for i, p in enumerate(players)}
     pts = np.zeros((n, 2))
@@ -908,8 +995,14 @@ def run_game(L, D, game, n, seed=7, use_roster=False, keep_typical=True):
             if j is not None:
                 pl[i, j] = a
 
-    margin = pts[:, 0] - pts[:, 1]
-    total = pts.sum(1)
+    raw_margin = pts[:, 0] - pts[:, 1]
+    raw_total = pts.sum(1)
+    # Calibration (fitted by tune.py on a past season) corrects the sim's average
+    # margin and total. It shifts every simulated game by the same amount rather
+    # than stretching them, so the game-to-game spread stays the sim's own.
+    margin = raw_margin + CFG["cal_a"] + (CFG["cal_b"] - 1) * raw_margin.mean()
+    total = raw_total + CFG["cal_c"]
+    cal_pts = np.column_stack([(total + margin) / 2, (total - margin) / 2])
     feats = np.column_stack([pts * 2, team[:, :, 0], team[:, :, 1], team[:, :, 2] * 30])
     med = np.median(feats, 0)
     sdv = feats.std(0) + 1e-9
@@ -918,9 +1011,11 @@ def run_game(L, D, game, n, seed=7, use_roster=False, keep_typical=True):
     out = {
         "game_id": game["game_id"], "home": home, "away": away, "sims": n, "week": L.week,
         "kickoff": f"{game.get('weekday', '')} {game.get('gametime', '')}".strip(),
-        "scores": pts.astype(int).ravel().tolist(),  # home, away, home, away, ...
+        "scores": np.round(cal_pts).astype(int).ravel().tolist(),  # home, away, home, away, ...
         "home_win": float((margin > 0).mean() + 0.5 * (margin == 0).mean()),
-        "home_pts": float(pts[:, 0].mean()), "away_pts": float(pts[:, 1].mean()),
+        "home_pts": float(cal_pts[:, 0].mean()), "away_pts": float(cal_pts[:, 1].mean()),
+        "raw": {"margin_mean": float(raw_margin.mean()), "total_mean": float(raw_total.mean()),
+                "home_win": float((raw_margin > 0).mean() + 0.5 * (raw_margin == 0).mean())},
         "margin_mean": float(margin.mean()), "margin_median": float(np.median(margin)),
         "total_mean": float(total.mean()), "total_median": float(np.median(total)),
         "qb": {"home": offs[0].names.get(offs[0].qb), "away": offs[1].names.get(offs[1].qb)},
