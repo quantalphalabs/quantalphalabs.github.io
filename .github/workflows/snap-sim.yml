@@ -1,12 +1,23 @@
-# Runs the snap sim on the NFL calendar. Every 15 minutes it asks autorun.py
-# what is due (the night-before run at 8pm ET, the pregame check 2 hours before
-# each kickoff, grading once finals are in) and commits whatever changed under
-# sim/. Most runs find nothing due and finish in under a minute.
+# Runs the snap sim on the NFL calendar: the night-before run at 8pm ET, the
+# pregame check 2 hours before each kickoff, grading once finals are in. Each
+# run asks autorun.py what is due, commits whatever changed under sim/, and then
+# stays up sleeping until the next check if that is less than ~5.5 hours away.
+#
+# The waiting is the point. GitHub runs scheduled workflows on a best-effort
+# basis: asked for every 15 minutes, this one actually started every 3-7 hours
+# in its first week, and the Sunday and Monday night pregame checks were missed.
+# A run that is already up and sleeping fires on time. The fixed game-day times
+# below make sure one is usually up before each window; the 15-minute schedule
+# stays as a backstop.
 name: Snap sim
 
 on:
   schedule:
     - cron: "*/15 * * * *"
+    - cron: "7 11 * * 0"      # Sunday 6-7am ET: London game and the early check
+    - cron: "7 15 * * 0"      # Sunday 10-11am ET: 1pm and 4pm checks
+    - cron: "7 19 * * 0,1,4"  # Sun/Mon/Thu 2-3pm ET: night-game checks
+    - cron: "7 22 * * 0,3,5,6" # 5-6pm ET before each 8pm night-before run
   workflow_dispatch:
     inputs:
       force:
@@ -29,7 +40,7 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
 
@@ -41,34 +52,45 @@ jobs:
 
       - run: pip install -r research/rotobot-sim/requirements.txt
 
-      - name: Run whatever is due
+      - name: Run what is due, then wait for the next check
         env:
           FORCE: ${{ inputs.force }}
           GAMES: ${{ inputs.games }}
+          GH_TOKEN: ${{ github.token }}
         run: |
+          git config user.name "snap-sim[bot]"
+          git config user.email "snap-sim@users.noreply.github.com"
+          data="$RUNNER_TEMP/nflverse"
+          sim="research/rotobot-sim/autorun.py"
+          deadline=$(( $(date +%s) + 330 * 60 ))   # leave room under the job timeout
+
           extra=""
           if [ -n "$FORCE" ] && [ "$FORCE" != "none" ]; then
             extra="--force $FORCE"
             [ -n "$GAMES" ] && extra="$extra --games $GAMES"
           fi
-          cd research/rotobot-sim
-          python autorun.py --data "$RUNNER_TEMP/nflverse" --site ../../sim $extra
 
-      - name: Commit and publish
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if [ -z "$(git status --porcelain sim)" ]; then
-            echo "Nothing changed."
-            exit 0
-          fi
-          git config user.name "snap-sim[bot]"
-          git config user.email "snap-sim@users.noreply.github.com"
-          git add sim
-          git commit -q -m "Snap sim: $(date -u +'%Y-%m-%d %H:%M') UTC"
-          for i in 1 2 3 4; do
-            git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}" && break
-            sleep $((i * 5))
+          publish() {
+            [ -z "$(git status --porcelain sim)" ] && return 0
+            git add sim
+            git commit -q -m "Snap sim: $(date -u +'%Y-%m-%d %H:%M') UTC"
+            for i in 1 2 3 4; do
+              git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}" && break
+              sleep $((i * 5))
+            done
+            # Branch-built Pages sites may not rebuild on a token push; ask explicitly.
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/pages/builds" >/dev/null || true
+          }
+
+          while true; do
+            python "$sim" --data "$data" --site sim $extra
+            extra=""   # a forced stage runs once
+            publish
+            wait=$(python "$sim" --data "$data" --site sim --no-download --next-due)
+            if [ "$wait" -lt 0 ] || [ $(( $(date +%s) + wait )) -gt "$deadline" ]; then
+              echo "Next check is not within this run (${wait}s); stopping."
+              break
+            fi
+            echo "Next check opens in ${wait}s; waiting."
+            sleep $(( wait + 20 ))
           done
-          # Branch-built Pages sites may not rebuild on a token push; ask explicitly.
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/pages/builds" >/dev/null || true

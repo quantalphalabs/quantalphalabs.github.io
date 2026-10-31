@@ -99,8 +99,7 @@ term, no weather, no explicit timeouts and no coverage data.
 ## On the website, automatically
 
 The page lives at [`/sim/`](../../sim/) on the site and is linked from the main
-navigation. `.github/workflows/snap-sim.yml` runs `autorun.py` every 15 minutes. Most
-runs find nothing due and stop. Otherwise:
+navigation. `.github/workflows/snap-sim.yml` runs `autorun.py`, commits what it wrote, and then stays up sleeping until the next check if that opens within about 5.5 hours. GitHub's own schedule is best effort: asked for every 15 minutes, it started this workflow every 3-7 hours in practice, which made early pregame checks late and missed two night games. Fixed game-day start times keep a run waiting before each window. The calendar:
 
 | When | What runs |
 | --- | --- |

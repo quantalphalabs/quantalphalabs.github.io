@@ -73,20 +73,34 @@ def schedule(data_dir, season):
     return g
 
 
-def due_jobs(g, manifest, now):
-    """What should run at `now`: a list of (stage, key, game_ids)."""
-    jobs = []
+def windows(g):
+    """Every run the calendar calls for: (stage, key, game_ids, opens, closes)."""
+    out = []
     open_games = g[g["result"].isna()]
     for day, sub in open_games.groupby("date"):
-        key = f"night:{day}"
-        start = dt.datetime.combine(day - dt.timedelta(days=1), dt.time(NIGHT_BEFORE_HOUR), ET)
-        if key not in manifest and start <= now < sub["ko"].min():
-            jobs.append(("night", key, list(sub["game_id"])))
+        opens = dt.datetime.combine(day - dt.timedelta(days=1), dt.time(NIGHT_BEFORE_HOUR), ET)
+        out.append(("night", f"night:{day}", list(sub["game_id"]), opens, sub["ko"].min()))
     for ko, sub in open_games.groupby("ko"):
-        key = f"pregame:{ko.isoformat()}"
-        if key not in manifest and ko - dt.timedelta(hours=PREGAME_HOURS) <= now < ko:
-            jobs.append(("pregame", key, list(sub["game_id"])))
-    return jobs
+        out.append(("pregame", f"pregame:{ko.isoformat()}", list(sub["game_id"]),
+                    ko - dt.timedelta(hours=PREGAME_HOURS), ko))
+    return out
+
+
+def due_jobs(g, manifest, now):
+    """What should run at `now`: a list of (stage, key, game_ids)."""
+    return [(stage, key, ids) for stage, key, ids, opens, closes in windows(g)
+            if key not in manifest and opens <= now < closes]
+
+
+def seconds_to_next(g, manifest, now):
+    """Seconds until the next window that has not run opens; -1 when none is left.
+    The workflow sleeps this long rather than trusting GitHub's cron, which in
+    practice fires every few hours, not every 15 minutes."""
+    upcoming = [opens for _, key, _, opens, closes in windows(g)
+                if key not in manifest and now < closes]
+    if not upcoming:
+        return -1
+    return max(0, int((min(upcoming) - now).total_seconds()))
 
 
 # --------------------------------------------------------------------------- injuries
@@ -313,6 +327,8 @@ def main():
     ap.add_argument("--force", choices=["night", "pregame"], help="run this stage now for --games")
     ap.add_argument("--games", help="comma-separated game_ids for --force")
     ap.add_argument("--no-download", action="store_true", help="use files already in --data")
+    ap.add_argument("--next-due", action="store_true",
+                    help="print seconds until the next run opens (-1 if none) and exit")
     args = ap.parse_args()
 
     now = dt.datetime.fromisoformat(args.now).astimezone(ET) if args.now else dt.datetime.now(ET)
@@ -327,6 +343,9 @@ def main():
     if not args.no_download:
         fetch_data(data_dir, season, schedule_only=True)
     g = schedule(data_dir, season)
+    if args.next_due:
+        print(seconds_to_next(g, manifest, now))
+        return
 
     if args.force:
         ids = args.games.split(",") if args.games else list(g[g["result"].isna() & (g["week"] == g[g["result"].isna()]["week"].min())]["game_id"])
