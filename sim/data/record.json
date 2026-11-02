@@ -473,5 +473,24 @@
   "total": 43.0,
   "home_score": 19,
   "away_score": 24
+ },
+ {
+  "game_id": "2026_08_PHI_WAS",
+  "week": 8,
+  "home": "WAS",
+  "away": "PHI",
+  "kickoff_at": "2026-11-01T20:20:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-01T23:20:19+00:00",
+  "sim_home_win": 0.49724999999999997,
+  "sim_margin": -0.1055,
+  "sim_total": 44.18649999999999,
+  "mkt_home_win": 0.705033164260632,
+  "mkt_margin": 6.0,
+  "mkt_total": 40.5,
+  "margin": 17.0,
+  "total": 37.0,
+  "home_score": 27,
+  "away_score": 10
  }
 ]
