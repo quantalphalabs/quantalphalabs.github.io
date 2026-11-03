@@ -492,5 +492,24 @@
   "total": 37.0,
   "home_score": 27,
   "away_score": 10
+ },
+ {
+  "game_id": "2026_08_CHI_SEA",
+  "week": 8,
+  "home": "SEA",
+  "away": "CHI",
+  "kickoff_at": "2026-11-02T20:15:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-02T23:42:07+00:00",
+  "sim_home_win": 0.58575,
+  "sim_margin": 2.4215,
+  "sim_total": 48.32649999999999,
+  "mkt_home_win": 0.6037569709421778,
+  "mkt_margin": 3.0,
+  "mkt_total": 46.5,
+  "margin": -17.0,
+  "total": 51.0,
+  "home_score": 17,
+  "away_score": 34
  }
 ]
