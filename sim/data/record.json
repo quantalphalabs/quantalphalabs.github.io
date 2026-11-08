@@ -530,5 +530,24 @@
   "total": 43.0,
   "home_score": 10,
   "away_score": 33
+ },
+ {
+  "game_id": "2026_09_CIN_ATL",
+  "week": 9,
+  "home": "ATL",
+  "away": "CIN",
+  "kickoff_at": "2026-11-08T09:30:00-05:00",
+  "stage": "night",
+  "run_at": "2026-11-08T01:00:19+00:00",
+  "sim_home_win": 0.50325,
+  "sim_margin": -0.024,
+  "sim_total": 51.41699999999999,
+  "mkt_home_win": 0.39076376554174075,
+  "mkt_margin": -3.0,
+  "mkt_total": 52.5,
+  "margin": -17.0,
+  "total": 51.0,
+  "home_score": 17,
+  "away_score": 34
  }
 ]
