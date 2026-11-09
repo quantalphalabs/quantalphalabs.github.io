@@ -758,5 +758,24 @@
   "total": 72.0,
   "home_score": 27,
   "away_score": 45
+ },
+ {
+  "game_id": "2026_09_TB_CHI",
+  "week": 9,
+  "home": "CHI",
+  "away": "TB",
+  "kickoff_at": "2026-11-08T20:20:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-08T23:20:19+00:00",
+  "sim_home_win": 0.5447500000000001,
+  "sim_margin": 0.8795,
+  "sim_total": 47.044499999999985,
+  "mkt_home_win": 0.7001620745542949,
+  "mkt_margin": 6.0,
+  "mkt_total": 47.5,
+  "margin": 3.0,
+  "total": 51.0,
+  "home_score": 27,
+  "away_score": 24
  }
 ]
