@@ -1,26 +1,26 @@
 {
- "games": 89,
+ "games": 104,
  "weeks": [
   3,
-  8
+  9
  ],
- "brier_sim": 0.22249905196629216,
- "brier_market": 0.22639658010312885,
- "margin_mae_sim": 8.57126404494382,
- "margin_mae_market": 8.853932584269662,
- "total_mae_sim": 10.794691011235956,
- "total_mae_market": 10.46629213483146,
- "total_bias_sim": -0.2843539325842703,
- "total_bias_market": -1.4213483146067416,
- "sim_vs_market_margin_corr": 0.7947832519400181,
+ "brier_sim": 0.2138951622596154,
+ "brier_market": 0.21114961398901766,
+ "margin_mae_sim": 8.727788461538463,
+ "margin_mae_market": 8.846153846153847,
+ "total_mae_sim": 10.815721153846154,
+ "total_mae_market": 10.413461538461538,
+ "total_bias_sim": -0.04423076923076959,
+ "total_bias_market": -1.0384615384615385,
+ "sim_vs_market_margin_corr": 0.8148736169010911,
  "ats_w_l_p": [
-  53,
-  31,
+  59,
+  40,
   5
  ],
  "ou_w_l_p": [
+  57,
   47,
-  42,
   0
  ],
  "sims_per_game": 400

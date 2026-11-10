@@ -777,5 +777,24 @@
   "total": 51.0,
   "home_score": 27,
   "away_score": 24
+ },
+ {
+  "game_id": "2026_09_BUF_MIN",
+  "week": 9,
+  "home": "MIN",
+  "away": "BUF",
+  "kickoff_at": "2026-11-09T20:15:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-10T00:36:50+00:00",
+  "sim_home_win": 0.44125,
+  "sim_margin": -1.6085,
+  "sim_total": 46.22249999999998,
+  "mkt_home_win": 0.3690596562184025,
+  "mkt_margin": -3.5,
+  "mkt_total": 45.5,
+  "margin": -17.0,
+  "total": 29.0,
+  "home_score": 6,
+  "away_score": 23
  }
 ]
