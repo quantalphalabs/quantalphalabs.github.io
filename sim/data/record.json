@@ -796,5 +796,24 @@
   "total": 29.0,
   "home_score": 6,
   "away_score": 23
+ },
+ {
+  "game_id": "2026_10_WAS_NYG",
+  "week": 10,
+  "home": "NYG",
+  "away": "WAS",
+  "kickoff_at": "2026-11-12T20:15:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-12T23:15:20+00:00",
+  "sim_home_win": 0.46075,
+  "sim_margin": -1.2525,
+  "sim_total": 44.22349999999999,
+  "mkt_home_win": 0.5324675324675325,
+  "mkt_margin": 1.5,
+  "mkt_total": 40.5,
+  "margin": -3.0,
+  "total": 45.0,
+  "home_score": 21,
+  "away_score": 24
  }
 ]
