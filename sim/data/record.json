@@ -815,5 +815,24 @@
   "total": 45.0,
   "home_score": 21,
   "away_score": 24
+ },
+ {
+  "game_id": "2026_10_NE_DET",
+  "week": 10,
+  "home": "DET",
+  "away": "NE",
+  "kickoff_at": "2026-11-15T09:30:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-15T12:30:20+00:00",
+  "sim_home_win": 0.5465,
+  "sim_margin": 1.1695,
+  "sim_total": 49.19249999999999,
+  "mkt_home_win": 0.5634920634920635,
+  "mkt_margin": 2.5,
+  "mkt_total": 50.5,
+  "margin": 25.0,
+  "total": 45.0,
+  "home_score": 35,
+  "away_score": 10
  }
 ]
