@@ -1024,5 +1024,24 @@
   "total": 86.0,
   "home_score": 40,
   "away_score": 46
+ },
+ {
+  "game_id": "2026_10_PIT_CIN",
+  "week": 10,
+  "home": "CIN",
+  "away": "PIT",
+  "kickoff_at": "2026-11-15T20:20:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-15T23:20:20+00:00",
+  "sim_home_win": 0.50525,
+  "sim_margin": 0.0605,
+  "sim_total": 50.266499999999986,
+  "mkt_home_win": 0.6309403437815976,
+  "mkt_margin": 3.5,
+  "mkt_total": 49.5,
+  "margin": 20.0,
+  "total": 56.0,
+  "home_score": 38,
+  "away_score": 18
  }
 ]
