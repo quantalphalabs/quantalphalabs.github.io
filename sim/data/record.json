@@ -1043,5 +1043,24 @@
   "total": 56.0,
   "home_score": 38,
   "away_score": 18
+ },
+ {
+  "game_id": "2026_10_LAC_BAL",
+  "week": 10,
+  "home": "BAL",
+  "away": "LAC",
+  "kickoff_at": "2026-11-16T20:15:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-17T00:15:28+00:00",
+  "sim_home_win": 0.4805,
+  "sim_margin": -0.586,
+  "sim_total": 41.196,
+  "mkt_home_win": 0.6636481241914618,
+  "mkt_margin": 4.5,
+  "mkt_total": 39.5,
+  "margin": -3.0,
+  "total": 43.0,
+  "home_score": 20,
+  "away_score": 23
  }
 ]
