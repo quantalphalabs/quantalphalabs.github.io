@@ -1062,5 +1062,24 @@
   "total": 43.0,
   "home_score": 20,
   "away_score": 23
+ },
+ {
+  "game_id": "2026_11_IND_HOU",
+  "week": 11,
+  "home": "HOU",
+  "away": "IND",
+  "kickoff_at": "2026-11-19T20:15:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-19T23:15:19+00:00",
+  "sim_home_win": 0.66475,
+  "sim_margin": 4.926,
+  "sim_total": 47.01799999999999,
+  "mkt_home_win": 0.8397565922920892,
+  "mkt_margin": 12.5,
+  "mkt_total": 44.5,
+  "margin": 23.0,
+  "total": 29.0,
+  "home_score": 26,
+  "away_score": 3
  }
 ]
