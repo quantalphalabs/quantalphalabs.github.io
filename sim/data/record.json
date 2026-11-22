@@ -1081,5 +1081,24 @@
   "total": 29.0,
   "home_score": 26,
   "away_score": 3
+ },
+ {
+  "game_id": "2026_11_ARI_KC",
+  "week": 11,
+  "home": "KC",
+  "away": "ARI",
+  "kickoff_at": "2026-11-22T13:00:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-22T17:25:05+00:00",
+  "sim_home_win": 0.7212500000000001,
+  "sim_margin": 6.089,
+  "sim_total": 47.18199999999999,
+  "mkt_home_win": 0.8998459167950693,
+  "mkt_margin": 15.5,
+  "mkt_total": 40.5,
+  "margin": 27.0,
+  "total": 41.0,
+  "home_score": 34,
+  "away_score": 7
  }
 ]
