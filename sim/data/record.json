@@ -1271,5 +1271,24 @@
   "total": 35.0,
   "home_score": 19,
   "away_score": 16
+ },
+ {
+  "game_id": "2026_11_MIN_SF",
+  "week": 11,
+  "home": "SF",
+  "away": "MIN",
+  "kickoff_at": "2026-11-22T20:20:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-22T23:20:20+00:00",
+  "sim_home_win": 0.42324999999999996,
+  "sim_margin": -1.9495,
+  "sim_total": 48.81449999999999,
+  "mkt_home_win": 0.6344283902414761,
+  "mkt_margin": 3.5,
+  "mkt_total": 45.5,
+  "margin": 25.0,
+  "total": 45.0,
+  "home_score": 35,
+  "away_score": 10
  }
 ]
