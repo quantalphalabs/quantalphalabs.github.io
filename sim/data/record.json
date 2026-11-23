@@ -1216,6 +1216,25 @@
   "away_score": 27
  },
  {
+  "game_id": "2026_11_JAX_NYG",
+  "week": 11,
+  "home": "NYG",
+  "away": "JAX",
+  "kickoff_at": "2026-11-22T16:25:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-22T19:25:19+00:00",
+  "sim_home_win": 0.28974999999999995,
+  "sim_margin": -6.419,
+  "sim_total": 47.16599999999998,
+  "mkt_home_win": 0.3022273743479341,
+  "mkt_margin": -6.0,
+  "mkt_total": 45.5,
+  "margin": 5.0,
+  "total": 41.0,
+  "home_score": 23,
+  "away_score": 18
+ },
+ {
   "game_id": "2026_11_LV_DEN",
   "week": 11,
   "home": "DEN",
