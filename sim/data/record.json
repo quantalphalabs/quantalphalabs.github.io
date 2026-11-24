@@ -1290,5 +1290,24 @@
   "total": 45.0,
   "home_score": 35,
   "away_score": 10
+ },
+ {
+  "game_id": "2026_11_CIN_WAS",
+  "week": 11,
+  "home": "WAS",
+  "away": "CIN",
+  "kickoff_at": "2026-11-23T20:15:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-24T00:54:58+00:00",
+  "sim_home_win": 0.35924999999999996,
+  "sim_margin": -4.046,
+  "sim_total": 49.59899999999998,
+  "mkt_home_win": 0.27932960893854747,
+  "mkt_margin": -6.0,
+  "mkt_total": 54.5,
+  "margin": 2.0,
+  "total": 42.0,
+  "home_score": 22,
+  "away_score": 20
  }
 ]
