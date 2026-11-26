@@ -1309,5 +1309,24 @@
   "total": 42.0,
   "home_score": 22,
   "away_score": 20
+ },
+ {
+  "game_id": "2026_12_GB_LA",
+  "week": 12,
+  "home": "LA",
+  "away": "GB",
+  "kickoff_at": "2026-11-25T20:00:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-25T23:21:21+00:00",
+  "sim_home_win": 0.5982500000000001,
+  "sim_margin": 3.067,
+  "sim_total": 50.66399999999999,
+  "mkt_home_win": 0.55603641247575,
+  "mkt_margin": 2.5,
+  "mkt_total": 43.5,
+  "margin": 13.0,
+  "total": 39.0,
+  "home_score": 26,
+  "away_score": 13
  }
 ]
