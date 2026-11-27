@@ -1347,5 +1347,43 @@
   "total": 74.0,
   "home_score": 35,
   "away_score": 39
+ },
+ {
+  "game_id": "2026_12_PHI_DAL",
+  "week": 12,
+  "home": "DAL",
+  "away": "PHI",
+  "kickoff_at": "2026-11-26T16:30:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-26T19:30:20+00:00",
+  "sim_home_win": 0.6405,
+  "sim_margin": 3.992,
+  "sim_total": 48.03799999999998,
+  "mkt_home_win": 0.788723045119199,
+  "mkt_margin": 8.5,
+  "mkt_total": 49.5,
+  "margin": -1.0,
+  "total": 77.0,
+  "home_score": 38,
+  "away_score": 39
+ },
+ {
+  "game_id": "2026_12_KC_BUF",
+  "week": 12,
+  "home": "BUF",
+  "away": "KC",
+  "kickoff_at": "2026-11-26T20:20:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-27T00:02:09+00:00",
+  "sim_home_win": 0.4625,
+  "sim_margin": -1.2635,
+  "sim_total": 49.67349999999998,
+  "mkt_home_win": 0.5840469782236358,
+  "mkt_margin": 3.0,
+  "mkt_total": 46.5,
+  "margin": 3.0,
+  "total": 23.0,
+  "home_score": 13,
+  "away_score": 10
  }
 ]
