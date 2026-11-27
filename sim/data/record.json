@@ -1328,5 +1328,24 @@
   "total": 39.0,
   "home_score": 26,
   "away_score": 13
+ },
+ {
+  "game_id": "2026_12_CHI_DET",
+  "week": 12,
+  "home": "DET",
+  "away": "CHI",
+  "kickoff_at": "2026-11-26T13:00:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-26T16:00:20+00:00",
+  "sim_home_win": 0.5724999999999999,
+  "sim_margin": 2.3345,
+  "sim_total": 50.516499999999986,
+  "mkt_home_win": 0.48017621145374445,
+  "mkt_margin": -1.5,
+  "mkt_total": 56.5,
+  "margin": -4.0,
+  "total": 74.0,
+  "home_score": 35,
+  "away_score": 39
  }
 ]
