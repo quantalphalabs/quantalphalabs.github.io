@@ -1385,5 +1385,24 @@
   "total": 23.0,
   "home_score": 13,
   "away_score": 10
+ },
+ {
+  "game_id": "2026_12_DEN_PIT",
+  "week": 12,
+  "home": "PIT",
+  "away": "DEN",
+  "kickoff_at": "2026-11-27T15:00:00-05:00",
+  "stage": "pregame",
+  "run_at": "2026-11-27T18:28:41+00:00",
+  "sim_home_win": 0.3985,
+  "sim_margin": -3.036,
+  "sim_total": 44.11799999999999,
+  "mkt_home_win": 0.3139013452914798,
+  "mkt_margin": -4.5,
+  "mkt_total": 37.5,
+  "margin": 22.0,
+  "total": 32.0,
+  "home_score": 27,
+  "away_score": 5
  }
 ]
